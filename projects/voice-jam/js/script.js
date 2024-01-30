@@ -11,6 +11,8 @@ author, and this description to match your project!
 const speechSynthesizer = new p5.Speech();
 const speechRecognizer = new p5.SpeechRec();
 
+let listening = false;
+
 let mapValues = {
     r: 100,
     g: 100,
@@ -31,6 +33,8 @@ let person1Success = "thank you"
 let person1Failure = "oh no"
 
 let person2Text = "hello, i'm back. I want to go to the classroom"
+
+let day3Text = "hello, i'm back. I want to go to the office"
 
 let showSubtitles = false;
 
@@ -59,6 +63,7 @@ Description of setup
 function setup() {
     createCanvas(500, 500)
 
+
     //Synthesis settings
     speechSynthesizer.setPitch(0.3);
     speechSynthesizer.setRate(0.5);
@@ -73,6 +78,7 @@ function setup() {
 
     speechSynthesizer.onEnd = () => {
         showSubtitle = false;
+        startListening();
     };
 
     //Speech recognizer
@@ -87,15 +93,8 @@ Description of draw()
 */
 function draw() {
     background(150, 50, 50)
-    console.log(speechRecognizer.resultString)
-    console.log(dialogue)
-    console.log(clownPositionA)
-    console.log(clownLeave)
 
     displaySubtitles()
-
-    // fill(mapValues.r, mapValues.g, mapValues.b, mapValues.a);
-    // rect(0, 0, 1500, 1500);
 
     if (state === `simulation`) {
         simulation();
@@ -116,6 +115,11 @@ function displaySubtitles() {
     if (showSubtitle && dialogue === 3) {
         textSize(20)
         text(person2Text, 200, 400)
+    }
+
+    if (showSubtitle && dialogue === 5) {
+        textSize(20)
+        text(day3Text, 200, 400)
     }
 }
 
@@ -152,6 +156,10 @@ function keyPressed() {
         image(mapImg, 0, 0);
         state = "mapDisplay"
     }
+
+    if (keyCode === 69) {
+        dialogue++
+    }
 }
 
 function missionOne() {
@@ -172,58 +180,82 @@ function mousePressed() {
         speechSynthesizer.speak(person2Text)
 
     }
+
+    if (dialogue === 4) {
+        dialogue++
+        speechSynthesizer.speak(day3Text)
+
+    }
 }
 
 function handleSpeechInput() {
+
+    if(!listening) {
+        return;
+    }
     //currentSpeech = speechRecognizer.resultString;
 
     // if user says one thing machine reacts another
     if (dialogue === 1 && speechRecognizer.resultString.toLowerCase() === "left forward") {
         dialogue++
         speechSynthesizer.speak(person1Success)
+        listening = false;
 
     } else if (dialogue === 1 && speechRecognizer.resultString.toLowerCase() !== "left forward") {
         dialogue++
         speechSynthesizer.speak(person1Failure)
+        listening = false;
     }
 
     if (dialogue === 3 && speechRecognizer.resultString.toLowerCase() === "left left right") {
         dialogue++
         speechSynthesizer.speak(person1Success)
+        listening = false;
 
     } else if (dialogue === 3 && speechRecognizer.resultString.toLowerCase() !== "left forward") {
         dialogue++
         speechSynthesizer.speak(person1Failure)
-
+        listening = false;
     }
 }
 
+function startListening(){
+    listening = true;
+    console.log("start listening now")
+}
+
 function microphoneDisplay() {
-    // if (dialogue == 1 && dialogue == 3) {
-    //     push()
-    //     image(microphone, 450, 100, 100, 100)
-    //     pop()
-    // }
-    push()
-    image(microphone, 450, 100, 100, 100)
-    pop()
+    if (listening === true) {
+        push()
+        image(microphone, 450, 100, 100, 100)
+        pop()
+    }
+
+    // push()
+    // image(microphone, 450, 100, 100, 100)
+    // pop()
 }
 
 function clownMovement() {
 
-    if (clownAppearance === false && (dialogue === 0 || dialogue === 3)) {
+    //Run 1
+    //Clown appears on screen
+    if (clownAppearance === false && (dialogue === 0 || dialogue === 3 || dialogue === 5)) {
         clownPositionA = clownPositionA + 5;
+        clownPositionB = 250
     }
 
     if (clownPositionA > clownPositionB) {
         clownAppearance = true
     }
 
+    //makes 0 position become 250 no matter what
     if (clownAppearance === true) {
         clownPositionA = clownPositionB
     }
 
-    if ((dialogue === 2 || dialogue === 4) && clownLeave === false) {
+    //makes 250 to move it more to 600 (C)
+    if ((dialogue === 2 || dialogue === 4 || dialogue === 6) && clownLeave === false) {
         clownPositionB = clownPositionB + 5
     }
 
@@ -231,7 +263,7 @@ function clownMovement() {
         clownLeave = true
     }
 
-    if (clownPositionB === clownPositionC && dialogue === 2) {
+    if (clownPositionB === clownPositionC && (dialogue === 2 || dialogue === 4)) {
         clownAppearance = false;
         clownLeave = false;
         clownPositionA = -100
