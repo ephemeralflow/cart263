@@ -66,7 +66,7 @@ function setup() {
 
     //Synthesis settings
     speechSynthesizer.setPitch(0.3);
-    speechSynthesizer.setRate(0.5);
+    speechSynthesizer.setRate(0.7);
 
     //I'm sorry I forgot how he sounds like so he can be bri'ish now
     //setting the voice of the synthesizer
@@ -74,11 +74,13 @@ function setup() {
 
     speechSynthesizer.onStart = () => {
         showSubtitle = true;
+        listening = false;
     };
 
     speechSynthesizer.onEnd = () => {
         showSubtitle = false;
-        startListening();
+        // startListening();
+        listening = true;
     };
 
     //Speech recognizer
@@ -93,10 +95,15 @@ Description of draw()
 */
 function draw() {
     background(150, 50, 50)
+    console.log(speechRecognizer.resultString)
+    console.log(dialogue)
+    console.log(listening)
 
     displaySubtitles()
 
-    if (state === `simulation`) {
+    if (state === "title") {
+        title();
+    } else if (state === `simulation`) {
         simulation();
     }
     else if (state === `mapDisplay`) {
@@ -123,6 +130,43 @@ function displaySubtitles() {
     }
 }
 
+//Displaying the whole title screen, its full of text and size and all of that, very straight forward.
+function title() {
+    push()
+    fill(255)
+    rect(0, 0, 500, 500)
+    fill(102, 44, 44)
+    textSize(40);
+    textAlign(CENTER, CENTER);
+    text(`WORKING AT\nTHE\nINFORMATION DESK`, width / 2, 100);
+    textSize(20);
+    text(`Instruction:`, width / 2, 210);
+    textSize(15);
+    textAlign(LEFT, CENTER);
+    text(`Press the UP arrow to see the map (and down to put it away)\nClick to hear out the customer\nSpeak into the microphone when the microphone symbol appears\nAnswer by giving strict directional instructions`, 30, 260);
+    textSize(20);
+    textAlign(CENTER, CENTER);
+    text(`Available directions to say:`, width / 2, 330);
+    textSize(15);
+    textStyle(BOLD);
+    textAlign(CENTER, CENTER);
+    text(`LEFT`, 60, 380);
+    text(`FORWARD`, width / 2, 360);
+    text(`RIGHT`, 440, 380);
+    textSize(15);
+    textAlign(CENTER, CENTER);
+    textStyle(NORMAL);
+    text(`Say them wisely and guide properly.`, width / 2, 400);
+    textStyle(BOLD);
+    text(`Good Luck.`, 257, 420);
+    textStyle(NORMAL);
+    text(`and`, 200, 420);
+    textSize(25);
+    textStyle(BOLD);
+    text(`PRESS ANYWHERE TO CONTINUE`, width / 2, 460);
+    pop()
+}
+
 function simulation() {
     push()
     fill(100, 250, 100)
@@ -139,7 +183,7 @@ function simulation() {
 function mapDisplay() {
     push()
     imageMode(CORNER)
-    image(mapImg, 0, 0);
+    image(mapImg, 0, 0, 530, 500);
     pop()
 }
 
@@ -153,7 +197,6 @@ function keyPressed() {
         mapValues.a = 0;
         state = "simulation"
     } else if (keyCode === UP_ARROW) {
-        image(mapImg, 0, 0);
         state = "mapDisplay"
     }
 
@@ -170,7 +213,11 @@ function missionOne() {
 function mousePressed() {
     //Say something
 
-    if (dialogue === 0) {
+    if (state === "title") {
+        state = "simulation"
+    }
+
+    if (dialogue === 0 && state === "simulation") {
         dialogue++
         speechSynthesizer.speak(person1Text)
     }
@@ -190,7 +237,7 @@ function mousePressed() {
 
 function handleSpeechInput() {
 
-    if(!listening) {
+    if (!listening) {
         return;
     }
     //currentSpeech = speechRecognizer.resultString;
@@ -219,7 +266,7 @@ function handleSpeechInput() {
     }
 }
 
-function startListening(){
+function startListening() {
     listening = true;
     console.log("start listening now")
 }
