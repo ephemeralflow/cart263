@@ -74,7 +74,6 @@ function setup() {
 
     speechSynthesizer.onStart = () => {
         showSubtitle = true;
-        listening = false;
     };
 
     speechSynthesizer.onEnd = () => {
