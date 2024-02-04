@@ -13,46 +13,83 @@ const speechRecognizer = new p5.SpeechRec();
 
 let listening = false;
 
-let mapValues = {
-    r: 100,
-    g: 100,
-    b: 120,
-    a: 255,
-}
-
-let state = "simulation"
+let state = "title"
 let mapImg;
-let clownPNG;
+let clownEnd1;
 let microphone;
 
-let dialogue = 0;
+let endBG;
+
+let timer = 3;
+let timer2 = 10;
+let timerNeutralEnd = 4;
+let timerGoodEnd = 8;
+let endTimer = 2;
+
+let bgFade = 0;
+
 let showSubtitle = false;
-
-let person1Text = "hello, I want to go to the store"
-let person1Success = "thank you"
-let person1Failure = "oh no"
-
-let person2Text = "hello, i'm back. I want to go to the classroom"
-
-let day3Text = "hello, i'm back. I want to go to the office"
 
 let showSubtitles = false;
 
-let clownAppearance = false;
-let clownLeave = false;
+let script = [
+    {
+        clownStartX: -100,
+        clownStopX: 250,
+        clownSpeech: `Hello, I want to go to the store.`,
+        correctResponse: `right forward`,
+        successSpeech: `Thank you.`,
+        failureSpeech: `Oh no.`
+    },
+    {
+        clownStartX: -100,
+        clownStopX: 250,
+        clownSpeech: `Hello, I'm back, I want to go to the classroom.`,
+        correctResponse: `right right left`,
+        successSpeech: `Thank you.`,
+        failureSpeech: `Oh no.`
+    },
+    {
+        clownStartX: -100,
+        clownStopX: 250,
+        clownSpeech: `Hello, I'm back, I want to go to the library.`,
+        correctResponse: `right right forward right`,
+        successSpeech: `Thank you.`,
+        failureSpeech: `Oh no.`
+    },
+    {
+        clownStartX: -100,
+        clownStopX: 250,
+        clownSpeech: ` `,
+        correctResponse: ` `,
+        successSpeech: ` `,
+        failureSpeech: ` `
+    },
+];
 
-let clownPositionA = -100;
-let clownPositionB = 250;
-let clownPositionC = 600;
+let goodEndScript = "Thank you for helping me all these days. I brought you a gift."
+let neutralEndScript = "Hello, I need help with-"
+let badEndScript = `hello again... Why would you keep giving me the wrong directions..? That was very rude...`
+let endSceneLine = 0;
 
+let currentScene = 0;
+let clownMood = 1;
 
-
+let clown = {
+    x: 0,
+    y: 200,
+    speed: 2,
+    image: undefined,
+    state: "off-stage", // off-stage, entering, speaking, listening, replying, leaving
+};
 /**
 Description of preload
 */
 function preload() {
     mapImg = loadImage('assets/images/mapTest.png');
-    clownPNG = loadImage('assets/images/clown.png');
+    endBG = loadImage('assets/images/AdobeStock_415752572.jpeg');
+    clown.image = loadImage('assets/images/clown.png');
+    clownEnd1 = loadImage('assets/images/clownEnd1.png');
     microphone = loadImage('assets/images/microphone.png');
 }
 
@@ -62,7 +99,6 @@ Description of setup
 */
 function setup() {
     createCanvas(500, 500)
-
 
     //Synthesis settings
     speechSynthesizer.setPitch(0.3);
@@ -78,8 +114,16 @@ function setup() {
 
     speechSynthesizer.onEnd = () => {
         showSubtitle = false;
-        // startListening();
-        listening = true;
+
+        switch (clown.state) {
+            case "speaking":
+                clown.state = "listening";
+                break;
+
+            case "replying":
+                clown.state = "leaving";
+                break;
+        }
     };
 
     //Speech recognizer
@@ -94,9 +138,10 @@ Description of draw()
 */
 function draw() {
     background(150, 50, 50)
-    console.log(speechRecognizer.resultString)
-    console.log(dialogue)
-    console.log(listening)
+    // console.log(speechRecognizer.resultString)
+    console.log(clownMood);
+    console.log(currentScene);
+    console.log(bgFade);
 
     displaySubtitles()
 
@@ -107,26 +152,26 @@ function draw() {
     }
     else if (state === `mapDisplay`) {
         mapDisplay();
-    } else if (state === `missionOne`) {
-        missionOne();
+    } else if (state === `endScene`) {
+        endScene();
     }
 }
 
 function displaySubtitles() {
-    if (showSubtitle && dialogue === 1) {
-        textSize(20)
-        text(person1Text, 200, 400)
-    }
+    // if (showSubtitle && dialogue === 1) {
+    //     textSize(20)
+    //     text(person1Text, 200, 400)
+    // }
 
-    if (showSubtitle && dialogue === 3) {
-        textSize(20)
-        text(person2Text, 200, 400)
-    }
+    // if (showSubtitle && dialogue === 3) {
+    //     textSize(20)
+    //     text(person2Text, 200, 400)
+    // }
 
-    if (showSubtitle && dialogue === 5) {
-        textSize(20)
-        text(day3Text, 200, 400)
-    }
+    // if (showSubtitle && dialogue === 5) {
+    //     textSize(20)
+    //     text(day3Text, 200, 400)
+    // }
 }
 
 //Displaying the whole title screen, its full of text and size and all of that, very straight forward.
@@ -173,10 +218,12 @@ function simulation() {
     pop()
 
     microphoneDisplay()
-
-    missionOne()
     clownMovement()
+    displayClown();
 
+    if (currentScene === 3) {
+        state = "endScene";
+    }
 }
 
 function mapDisplay() {
@@ -188,25 +235,53 @@ function mapDisplay() {
 
 //buttons to show map
 function keyPressed() {
-    if (keyCode === LEFT_ARROW) {
-        mapValues.r = 255
-    } else if (keyCode === RIGHT_ARROW) {
-        value = 0;
-    } else if (keyCode === DOWN_ARROW) {
-        mapValues.a = 0;
+    if (keyCode === DOWN_ARROW) {
         state = "simulation"
     } else if (keyCode === UP_ARROW) {
         state = "mapDisplay"
     }
 
     if (keyCode === 69) {
-        dialogue++
+        currentScene++
     }
 }
 
-function missionOne() {
+function clownMovement() {
+    // Handle the clown based on what state they are in
+
+    switch (clown.state) {
+        case "off-stage":
+            // Do nothing
+            break;
+        case "entering":
+            clown.x += clown.speed;
+            if (clown.x >= script[currentScene].clownStopX) {
+                // The clown should stop and deliver its line
+                clown.state = "speaking";
+                // Say it!
+                speechSynthesizer.speak(script[currentScene].clownSpeech);
+            }
+            break;
+        case "listening":
+            // Do nothing
+            break;
+        case "replying":
+            // Do nothing
+            break;
+        case "leaving":
+            clown.x += clown.speed;
+            if (clown.x >= 600) {
+                // The clown goes off stage
+                currentScene++;
+                setupScene();
+            }
+            break;
+    }
+}
+
+function displayClown() {
     imageMode(CENTER)
-    image(clownPNG, clownPositionA, height / 2)
+    image(clown.image, clown.x, clown.y)
 }
 
 function mousePressed() {
@@ -214,67 +289,43 @@ function mousePressed() {
 
     if (state === "title") {
         state = "simulation"
+        currentScene = 0;
+        setupScene();
     }
+}
 
-    if (dialogue === 0 && state === "simulation") {
-        dialogue++
-        speechSynthesizer.speak(person1Text)
-    }
-
-    if (dialogue === 2) {
-        dialogue++
-        speechSynthesizer.speak(person2Text)
-
-    }
-
-    if (dialogue === 4) {
-        dialogue++
-        speechSynthesizer.speak(day3Text)
-
-    }
+function setupScene() {
+    clown.x = script[currentScene].clownStartX;
+    clown.state = "entering"; // Bring on the clown...
 }
 
 function handleSpeechInput() {
 
-    if (!listening) {
+    if (clown.state !== `listening` || !speechRecognizer.resultValue) {
         return;
     }
     //currentSpeech = speechRecognizer.resultString;
 
-    // if user says one thing machine reacts another
-    if (dialogue === 1 && speechRecognizer.resultString.toLowerCase() === "left forward") {
-        dialogue++
-        speechSynthesizer.speak(person1Success)
-        listening = false;
+    console.log(speechRecognizer.resultString);
 
-    } else if (dialogue === 1 && speechRecognizer.resultString.toLowerCase() !== "left forward") {
-        dialogue++
-        speechSynthesizer.speak(person1Failure)
-        listening = false;
+    let lowercase = speechRecognizer.resultString.toLowerCase();
+
+    if (lowercase === script[currentScene].correctResponse) {
+        // They said the right thing
+        speechSynthesizer.speak(script[currentScene].successSpeech);
+        clownMood = clownMood + 0.5;
     }
-
-    if (dialogue === 3 && speechRecognizer.resultString.toLowerCase() === "left left right") {
-        dialogue++
-        speechSynthesizer.speak(person1Success)
-        listening = false;
-
-    } else if (dialogue === 3 && speechRecognizer.resultString.toLowerCase() !== "left forward") {
-        dialogue++
-        speechSynthesizer.speak(person1Failure)
-        listening = false;
+    else {
+        // They said the wrong thing
+        speechSynthesizer.speak(script[currentScene].failureSpeech);
+        clownMood = clownMood - 0.5;
     }
-}
-
-function startListening() {
-    listening = true;
-    console.log("start listening now")
+    clown.state = `replying`;
 }
 
 function microphoneDisplay() {
-    if (listening === true) {
-        push()
-        image(microphone, 450, 100, 100, 100)
-        pop()
+    if (clown.state === `listening`) {
+        image(microphone, 450, 100, 100, 100);
     }
 
     // push()
@@ -282,39 +333,110 @@ function microphoneDisplay() {
     // pop()
 }
 
-function clownMovement() {
+function endScene() {
+    push()
+    imageMode(CORNER)
+    image(endBG, 0, 0, 530, 500);
+    pop()
 
-    //Run 1
-    //Clown appears on screen
-    if (clownAppearance === false && (dialogue === 0 || dialogue === 3 || dialogue === 5)) {
-        clownPositionA = clownPositionA + 5;
-        clownPositionB = 250
+    if (clownMood === 2.5) {
+        if (frameCount % 60 == 0 && timer > 0) {
+            timer--;
+        }
+
+        if (timer == 0) {
+            imageMode(CORNER)
+            image(clownEnd1, 0, 0, 500, 500);
+            speechSynthesizer.speak(goodEndScript);
+            endSceneLine++
+
+            if (frameCount % 60 == 0 && timerGoodEnd > 0) {
+                timerGoodEnd--;
+            }
+        }
+
+        if (timerGoodEnd === 0) {
+            speechSynthesizer.cancel()
+            timer = 2
+            fill(0, 0, 255, bgFade)
+            bgFade += 20;
+            rect(0, 0, 500, 500)
+            textSize(20)
+            fill(0)
+            text("GOOD END", width / 2, height / 2)
+
+            if (frameCount % 60 == 0 && endTimer > 0) {
+                endTimer--;
+            }
+        }
     }
 
-    if (clownPositionA > clownPositionB) {
-        clownAppearance = true
+    if (clownMood >= 0 && clownMood <= 1.5) {
+        if (frameCount % 60 == 0 && timer > 0) {
+            timer--;
+        }
+
+        if (timer == 0) {
+            imageMode(CORNER)
+            image(clownEnd1, 0, 0, 500, 500);
+            speechSynthesizer.speak(neutralEndScript);
+            endSceneLine++
+
+            if (frameCount % 60 == 0 && timerNeutralEnd > 0) {
+                timerNeutralEnd--;
+            }
+        }
+
+        if (timerNeutralEnd === 0) {
+            speechSynthesizer.cancel()
+            timer = 2
+            fill(0, 255, 0, bgFade)
+            bgFade += 20;
+            rect(0, 0, 500, 500)
+            textSize(20)
+            fill(0)
+            text("NEUTRAL END", width / 2, height / 2)
+
+            if (frameCount % 60 == 0 && endTimer > 0) {
+                endTimer--;
+            }
+        }
     }
 
-    //makes 0 position become 250 no matter what
-    if (clownAppearance === true) {
-        clownPositionA = clownPositionB
+    if (clownMood === -0.5) {
+        if (frameCount % 60 == 0 && timer > 0) {
+            timer--;
+        }
+
+        if (timer == 0) {
+            imageMode(CORNER)
+            image(clownEnd1, 0, 0, 500, 500);
+            speechSynthesizer.speak(badEndScript);
+            endSceneLine++
+
+            if (frameCount % 60 == 0 && timer2 > 0) {
+                timer2--;
+            }
+        }
+
+        if (timer2 === 0) {
+            speechSynthesizer.cancel()
+            timer = 2
+            fill(255, 0, 0, bgFade)
+            bgFade += 20;
+            rect(0, 0, 500, 500)
+            textSize(20)
+            fill(0)
+            text("BAD END", width / 2, height / 2)
+
+            if (frameCount % 60 == 0 && endTimer > 0) {
+                endTimer--;
+            }
+        }
     }
 
-    //makes 250 to move it more to 600 (C)
-    if ((dialogue === 2 || dialogue === 4 || dialogue === 6) && clownLeave === false) {
-        clownPositionB = clownPositionB + 5
-    }
-
-    if (clownPositionB > clownPositionC) {
-        clownLeave = true
-    }
-
-    if (clownPositionB === clownPositionC && (dialogue === 2 || dialogue === 4)) {
-        clownAppearance = false;
-        clownLeave = false;
-        clownPositionA = -100
-        clownPositionB = 250
-        clownPositionC = 600
+    if (endTimer === 0) {
+        noLoop()
     }
 
 }
