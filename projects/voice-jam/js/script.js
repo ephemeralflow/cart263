@@ -23,14 +23,12 @@ let endBG;
 let timer = 3;
 let timer2 = 10;
 let timerNeutralEnd = 4;
-let timerGoodEnd = 8;
+let timerGoodEnd = 7;
 let endTimer = 2;
 
 let bgFade = 0;
 
 let showSubtitle = false;
-
-let showSubtitles = false;
 
 let script = [
     {
@@ -139,9 +137,9 @@ Description of draw()
 function draw() {
     background(150, 50, 50)
     // console.log(speechRecognizer.resultString)
-    console.log(clownMood);
-    console.log(currentScene);
-    console.log(bgFade);
+    // console.log(clownMood);
+    // console.log(currentScene);
+    // console.log(bgFade);
 
     displaySubtitles()
 
@@ -158,20 +156,38 @@ function draw() {
 }
 
 function displaySubtitles() {
-    // if (showSubtitle && dialogue === 1) {
-    //     textSize(20)
-    //     text(person1Text, 200, 400)
-    // }
 
-    // if (showSubtitle && dialogue === 3) {
-    //     textSize(20)
-    //     text(person2Text, 200, 400)
-    // }
+    //shows subtitles for when the clown is speaking
+    if (showSubtitle && clown.state === "speaking") {
+        push()
+        textSize(20)
+        textAlign(CENTER);
+        text(script[currentScene].clownSpeech, width / 2, 400)
+        pop()
+    }
 
-    // if (showSubtitle && dialogue === 5) {
-    //     textSize(20)
-    //     text(day3Text, 200, 400)
-    // }
+    if (showSubtitle && clown.state === "replying") {
+        push()
+        textSize(20)
+        textAlign(CENTER);
+
+        //converts whatever comes into the speech recognizer into lowercase
+        let lowercase = speechRecognizer.resultString.toLowerCase();
+
+        //if the user gives the correct answer, then it will show the text of what the clown said in the right answer
+        if (lowercase === script[currentScene].correctResponse) {
+            // They said the right thing
+            text(script[currentScene].successSpeech, width / 2, 400)
+        }
+        //same as previous if statement, only that instead of the correct answer, the text for the wrong answer is shown
+        else {
+            // They said the wrong thing
+            text(script[currentScene].failureSpeech, width / 2, 400)
+        }
+        pop()
+    }
+
+
 }
 
 //Displaying the whole title screen, its full of text and size and all of that, very straight forward.
@@ -212,9 +228,16 @@ function title() {
 }
 
 function simulation() {
+    // push()
+    // fill(100, 250, 100)
+    // rect(0, 0, 130, 130)
+    // pop()
+
     push()
-    fill(100, 250, 100)
-    rect(0, 0, 130, 130)
+    fill(0)
+    textSize(20)
+    stroke(255)
+    text("Press UP key\nfor MAP.", 20, 40)
     pop()
 
     microphoneDisplay()
