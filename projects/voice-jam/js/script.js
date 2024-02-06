@@ -102,15 +102,17 @@ function setup() {
     speechSynthesizer.setPitch(0.3);
     speechSynthesizer.setRate(0.7);
 
-    //I'm sorry I forgot how he sounds like so he can be bri'ish now
     //setting the voice of the synthesizer
     speechSynthesizer.setVoice("Google UK English Male")
 
     speechSynthesizer.onStart = () => {
+        //makes it that when the clown speaks, subtitles will change to "true" making it that when the clown speaks, it will have what it says under it)
         showSubtitle = true;
     };
 
+    //When the clown is not speaking, it will change states to it's respective state (such as listening for when the user speaks or leaving as it leaves the screen.)
     speechSynthesizer.onEnd = () => {
+        //When the clown stops speaking, the subtitles will no longer show
         showSubtitle = false;
 
         switch (clown.state) {
@@ -135,14 +137,13 @@ function setup() {
 Description of draw()
 */
 function draw() {
+    //setting the background
     background(150, 50, 50)
-    // console.log(speechRecognizer.resultString)
-    // console.log(clownMood);
-    // console.log(currentScene);
-    // console.log(bgFade);
 
+    //Making that the display of the subtitles always exist and will run during the whole program no matter the state.
     displaySubtitles()
 
+    //stating the states of the game itself 
     if (state === "title") {
         title();
     } else if (state === `simulation`) {
@@ -240,6 +241,33 @@ function simulation() {
     text("Press UP key\nfor MAP.", 20, 40)
     pop()
 
+    if (currentScene === 0) {
+        push()
+        fill(0)
+        textSize(20)
+        stroke(255)
+        text("Day 1.", 430, 40)
+        pop()
+    }
+
+    if (currentScene === 1) {
+        push()
+        fill(0)
+        textSize(20)
+        stroke(255)
+        text("Day 2.", 430, 40)
+        pop()
+    }
+
+    if (currentScene === 2) {
+        push()
+        fill(0)
+        textSize(20)
+        stroke(255)
+        text("Day 3.", 430, 40)
+        pop()
+    }
+
     microphoneDisplay()
     clownMovement()
     displayClown();
@@ -250,6 +278,7 @@ function simulation() {
 }
 
 function mapDisplay() {
+    //displays the map that is used furing the game
     push()
     imageMode(CORNER)
     image(mapImg, 0, 0, 530, 500);
@@ -327,7 +356,6 @@ function handleSpeechInput() {
     if (clown.state !== `listening` || !speechRecognizer.resultValue) {
         return;
     }
-    //currentSpeech = speechRecognizer.resultString;
 
     console.log(speechRecognizer.resultString);
 
