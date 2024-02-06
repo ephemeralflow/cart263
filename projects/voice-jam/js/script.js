@@ -8,6 +8,7 @@ author, and this description to match your project!
 
 "use strict";
 
+//constants for the speech synthesizer and recognizer (making it that the program can then use it)
 const speechSynthesizer = new p5.Speech();
 const speechRecognizer = new p5.SpeechRec();
 
@@ -20,6 +21,7 @@ let microphone;
 
 let endBG;
 
+//setting up timers for the ending cards
 let timer = 3;
 let timer2 = 10;
 let timerNeutralEnd = 4;
@@ -30,6 +32,7 @@ let bgFade = 0;
 
 let showSubtitle = false;
 
+//array for the clown object, hosting the dialogue that the clown would say not only at arrival but also when you say the wrong or right answer. The array also holds the clown's original position as well as the one it will stop at when it will start speaking. Finally, there is also the right answer as well for what the user is supposed to say
 let script = [
     {
         clownStartX: -100,
@@ -65,14 +68,12 @@ let script = [
     },
 ];
 
-let goodEndScript = "Thank you for helping me all these days. I brought you a gift."
-let neutralEndScript = "Hello, I need help with-"
-let badEndScript = `hello again... Why would you keep giving me the wrong directions..? That was very rude...`
-let endSceneLine = 0;
-
+//Current scene is to know in which part o the array the game would be
 let currentScene = 0;
+//Clown mood is made for the endings, when there is a wrong answer it would make the mood go down, however, if it is the right answer 
 let clownMood = 1;
 
+//clown object itself, specifically for the speed of it's movement, it's placement. the image (that will then be loaded in) and also it's state that would then change depending on which part it is on
 let clown = {
     x: 0,
     y: 200,
@@ -80,8 +81,18 @@ let clown = {
     image: undefined,
     state: "off-stage", // off-stage, entering, speaking, listening, replying, leaving
 };
+
+//Ending texts for the synthesizer to read out in the endings 
+let goodEndScript = "Thank you for helping me all these days. I brought you a gift."
+let neutralEndScript = "Hello, I need help with-"
+let badEndScript = `hello again... Why would you keep giving me the wrong directions..? That was very rude...`
+let endSceneLine = 0;
+
+
+
+
 /**
-Description of preload
+Loads all the images needed for later
 */
 function preload() {
     mapImg = loadImage('assets/images/mapTest.png');
@@ -491,3 +502,11 @@ function endScene() {
     }
 
 }
+
+/*
+- date plan A to Z (?) clown getting nice stuff for a date.... MAYBE????
+- COMPUTER STUFFS "where is the background function?" CHANGING THE BG IF RIGHT DIRECTION???? next sound so just the sound o the synthesizer being lowered
+- the idea that there is text for the user to say s its more intuintive that you are the one speaking so the idea that like we are like "i cant hear you" and the clown is like sorry and leaves and then comes back and is like sorry I lowere the sound it was bugging me
+- giving the wrong answer and another person who came to the help desk being like you gave the wrong directions? are you dumb?
+- the map getting a new text after like the second time the clown comes LIKE "DO NOT SAY" and if you do idk bad stuff happen^tm
+*/
