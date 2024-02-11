@@ -1,9 +1,9 @@
 /**
-Title of Project
-Author Name
+Working at the Information Desk
+Scarlett Perez
 
-This is a template. You must fill in the title,
-author, and this description to match your project!
+Your job is to help a clown reach his destinations, with the help of a map, you can give him the good or bad answers depending on how you're feeling!
+This is early early alpha of the game but it's mostly because everytime I tried to do something it just wouldn't work and completely collapse the program or just make it not listen and work anymore. This has been going on the whole week so I think this is a good alpha to give in as it's the last workable version of the game that I made slightly prettier from it's original last working version
 */
 
 "use strict";
@@ -86,7 +86,6 @@ let clown = {
 let goodEndScript = "Thank you for helping me all these days. I brought you a gift."
 let neutralEndScript = "Hello, I need help with-"
 let badEndScript = `hello again... Why would you keep giving me the wrong directions..? That was very rude...`
-let endSceneLine = 0;
 
 
 
@@ -104,7 +103,7 @@ function preload() {
 
 
 /**
-Description of setup
+Setting up the synthesizer and recognizer
 */
 function setup() {
     createCanvas(500, 500)
@@ -126,6 +125,7 @@ function setup() {
         //When the clown stops speaking, the subtitles will no longer show
         showSubtitle = false;
 
+        //Change the clown state on the end of the speech
         switch (clown.state) {
             case "speaking":
                 clown.state = "listening";
@@ -180,18 +180,19 @@ function displaySubtitles() {
 
     if (showSubtitle && clown.state === "replying") {
         push()
+        //makes sure the text is aligned to the center of the canvas
         textSize(20)
         textAlign(CENTER);
 
-        //converts whatever comes into the speech recognizer into lowercase
+        //Converts whatever comes into the speech recognizer into lowercase
         let lowercase = speechRecognizer.resultString.toLowerCase();
 
-        //if the user gives the correct answer, then it will show the text of what the clown said in the right answer
+        //If the user gives the correct answer, then it will show the text of what the clown said in the right answer
         if (lowercase === script[currentScene].correctResponse) {
             // They said the right thing
             text(script[currentScene].successSpeech, width / 2, 400)
         }
-        //same as previous if statement, only that instead of the correct answer, the text for the wrong answer is shown
+        //Same as previous if statement, only that instead of the correct answer, the text for the wrong answer is shown
         else {
             // They said the wrong thing
             text(script[currentScene].failureSpeech, width / 2, 400)
@@ -240,11 +241,8 @@ function title() {
 }
 
 function simulation() {
-    // push()
-    // fill(100, 250, 100)
-    // rect(0, 0, 130, 130)
-    // pop()
 
+    //reminder text that you can press the UP text for the map + it's display
     push()
     fill(0)
     textSize(20)
@@ -252,6 +250,7 @@ function simulation() {
     text("Press UP key\nfor MAP.", 20, 40)
     pop()
 
+    //A day counter that changes depending how many times the clown comes
     if (currentScene === 0) {
         push()
         fill(0)
@@ -266,7 +265,7 @@ function simulation() {
         fill(0)
         textSize(20)
         stroke(255)
-        text("Day 2.", 430, 40)
+        text("Day 5.", 430, 40)
         pop()
     }
 
@@ -275,43 +274,42 @@ function simulation() {
         fill(0)
         textSize(20)
         stroke(255)
-        text("Day 3.", 430, 40)
+        text("Day 23.", 430, 40)
         pop()
     }
 
+    //Displaying the microphone and clown as well as activating the clown's movement
     microphoneDisplay()
     clownMovement()
     displayClown();
 
+    //when scene reaches 3, change the state to the ending ones
     if (currentScene === 3) {
         state = "endScene";
     }
 }
 
 function mapDisplay() {
-    //displays the map that is used furing the game
+    //displays the map that is used during the game
     push()
     imageMode(CORNER)
     image(mapImg, 0, 0, 530, 500);
     pop()
 }
 
-//buttons to show map
 function keyPressed() {
+    //When the down arrow is pressed, call back the simulation state (after being in the map state)
     if (keyCode === DOWN_ARROW) {
         state = "simulation"
-    } else if (keyCode === UP_ARROW) {
-        state = "mapDisplay"
     }
-
-    if (keyCode === 69) {
-        currentScene++
+    //When the up arrow is pressed, display the map
+    else if (keyCode === UP_ARROW) {
+        state = "mapDisplay"
     }
 }
 
 function clownMovement() {
     // Handle the clown based on what state they are in
-
     switch (clown.state) {
         case "off-stage":
             // Do nothing
@@ -343,13 +341,13 @@ function clownMovement() {
 }
 
 function displayClown() {
+    //Display the clown image with the X, Y coordinates previously mentioned
     imageMode(CENTER)
     image(clown.image, clown.x, clown.y)
 }
 
 function mousePressed() {
-    //Say something
-
+    //If the mouse is pressed in the title screen, change the state to simulation as well as make sure the counter of the scenes are at 0 and finally calling for the clown to appear.
     if (state === "title") {
         state = "simulation"
         currentScene = 0;
@@ -358,65 +356,76 @@ function mousePressed() {
 }
 
 function setupScene() {
+    //get the X value of the clown and bring the clown by changing it's state to "entering"
     clown.x = script[currentScene].clownStartX;
-    clown.state = "entering"; // Bring on the clown...
+    clown.state = "entering";
 }
 
 function handleSpeechInput() {
 
+    //If the clown isn't listening and there is nothing in the speech recognizer, do nothing
     if (clown.state !== `listening` || !speechRecognizer.resultValue) {
         return;
     }
 
-    console.log(speechRecognizer.resultString);
-
+    //just making it easier to write down the result string being in lowercase (to try to make the computer less confused)
     let lowercase = speechRecognizer.resultString.toLowerCase();
 
+    //If the response given is the same as what would be the correct response to give to the clown, give the success speech as well as raise the mood of the clown
     if (lowercase === script[currentScene].correctResponse) {
         // They said the right thing
         speechSynthesizer.speak(script[currentScene].successSpeech);
         clownMood = clownMood + 0.5;
     }
+    //However, if the opposite is given, make the clown respond negatively as well as drop the mood of the clown
     else {
         // They said the wrong thing
         speechSynthesizer.speak(script[currentScene].failureSpeech);
         clownMood = clownMood - 0.5;
     }
+    //Finally, after all that, change the clown state to "replying"
     clown.state = `replying`;
 }
 
 function microphoneDisplay() {
+    //When the clown is no longer speaking, the state would change to listening, making it that then a microphone icon would appear making it a visual cue for the user to know when they can speak.
     if (clown.state === `listening`) {
         image(microphone, 450, 100, 100, 100);
     }
-
-    // push()
-    // image(microphone, 450, 100, 100, 100)
-    // pop()
 }
 
 function endScene() {
+    //Add the ending CG
     push()
     imageMode(CORNER)
     image(endBG, 0, 0, 530, 500);
+    textSize(20)
+    fill(255)
+    textAlign(CENTER)
+    text("you are making your way home", width / 2, height / 2)
     pop()
 
+    //GOOD END
     if (clownMood === 2.5) {
+
+        //Start first timer that waits awhile before letting the clown speak
         if (frameCount % 60 == 0 && timer > 0) {
             timer--;
         }
 
+        //When the previous counter reaches 0, start the clown good ending speech
         if (timer == 0) {
             imageMode(CORNER)
             image(clownEnd1, 0, 0, 500, 500);
             speechSynthesizer.speak(goodEndScript);
-            endSceneLine++
 
+            //Start the good end timer, lets clown finish speaking to then execute the fade in
             if (frameCount % 60 == 0 && timerGoodEnd > 0) {
                 timerGoodEnd--;
             }
         }
 
+        //When the good end timer ends, stop the speech synthesizer (so it doesnt keep repeating) to then add a background fade in and good ending text
         if (timerGoodEnd === 0) {
             speechSynthesizer.cancel()
             timer = 2
@@ -424,31 +433,37 @@ function endScene() {
             bgFade += 20;
             rect(0, 0, 500, 500)
             textSize(20)
+            textAlign(CENTER)
             fill(0)
             text("GOOD END", width / 2, height / 2)
 
+            //Start ending timer to let the fade in of the background happen but also for the eventual noLoop
             if (frameCount % 60 == 0 && endTimer > 0) {
                 endTimer--;
             }
         }
     }
 
+    //NEUTRAL END
     if (clownMood >= 0 && clownMood <= 1.5) {
+        //Starts the timer
         if (frameCount % 60 == 0 && timer > 0) {
             timer--;
         }
 
+        //when the timer hits 0, start the neutral end script
         if (timer == 0) {
             imageMode(CORNER)
             image(clownEnd1, 0, 0, 500, 500);
             speechSynthesizer.speak(neutralEndScript);
-            endSceneLine++
 
+            //starts the neutral end timer
             if (frameCount % 60 == 0 && timerNeutralEnd > 0) {
                 timerNeutralEnd--;
             }
         }
 
+        //when timer finishes (around when the clown should finish speaking) cancel the speech, fade in new background, add ending text
         if (timerNeutralEnd === 0) {
             speechSynthesizer.cancel()
             timer = 2
@@ -456,6 +471,7 @@ function endScene() {
             bgFade += 20;
             rect(0, 0, 500, 500)
             textSize(20)
+            textAlign(CENTER)
             fill(0)
             text("NEUTRAL END", width / 2, height / 2)
 
@@ -465,48 +481,54 @@ function endScene() {
         }
     }
 
+    //BAD ENDING
     if (clownMood === -0.5) {
+        //Start timer
         if (frameCount % 60 == 0 && timer > 0) {
             timer--;
         }
 
+        //When the first timer reaches 0, the clown will begin their bad ending speech.
         if (timer == 0) {
+            //Display image
             imageMode(CORNER)
             image(clownEnd1, 0, 0, 500, 500);
+            //Say the ending speech
             speechSynthesizer.speak(badEndScript);
-            endSceneLine++
 
+            // start final counter of the game to let the clown finish as well as making the final ending card available.
             if (frameCount % 60 == 0 && timer2 > 0) {
                 timer2--;
             }
         }
 
         if (timer2 === 0) {
+            //stop the speech synthesizer when the final fade in happens of the ending sequence
             speechSynthesizer.cancel()
+            //resets the main timer
             timer = 2
+            //fill the background with the fade of the ending sequence
             fill(255, 0, 0, bgFade)
+            //Add onto bgFade, adding on to the alpha layer of the background
             bgFade += 20;
+            //add what would be the background as a full rectangle covering everything
             rect(0, 0, 500, 500)
+            //Adding the ending text
             textSize(20)
             fill(0)
+            textAlign(CENTER)
             text("BAD END", width / 2, height / 2)
 
+            //Start the final timer to allow the background to fully fade in and stop the game.
             if (frameCount % 60 == 0 && endTimer > 0) {
                 endTimer--;
             }
         }
     }
 
+    //the moment that the final timer reaches zero, end the game
     if (endTimer === 0) {
         noLoop()
     }
 
 }
-
-/*
-- date plan A to Z (?) clown getting nice stuff for a date.... MAYBE????
-- COMPUTER STUFFS "where is the background function?" CHANGING THE BG IF RIGHT DIRECTION???? next sound so just the sound o the synthesizer being lowered
-- the idea that there is text for the user to say s its more intuintive that you are the one speaking so the idea that like we are like "i cant hear you" and the clown is like sorry and leaves and then comes back and is like sorry I lowere the sound it was bugging me
-- giving the wrong answer and another person who came to the help desk being like you gave the wrong directions? are you dumb?
-- the map getting a new text after like the second time the clown comes LIKE "DO NOT SAY" and if you do idk bad stuff happen^tm
-*/
