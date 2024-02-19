@@ -8,12 +8,10 @@ author, and this description to match your project!
 
 "use strict";
 
-// The Facemesh face detector
-let facemesh;
 // This will store the image we drop onto the canvas
 let img;
 
-// For tracking whether Facemesh is ready or not
+// changing the state to when it finished loading
 const STATE = {
     STARTUP: `STARTUP`,
     DETECTING: `DETECTING`
@@ -38,7 +36,6 @@ function setup() {
     // a file onto it
     canvas.drop(gotImageFile);
 
-    // Start Facemesh
     objectDetector = ml5.objectDetector(`yolo`, modelLoaded);
 }
 
@@ -47,24 +44,14 @@ Loads the dropped file (assumes it's an image) into an HTML img
 element and then runs Facemesh on the image
 */
 function gotImageFile(file) {
-    // Create an img element from the dropped file
-    // (including alt text)
     img = createImg(file.data, `User image`);
-    // Set its size so that Facemesh doesn't freak out
-    // There may be some issues around mismatching dimensions here
     img.size(width, height);
-    // Hide it because we don't want the HTML element visible
     img.hide();
 }
 
-/**
-Called when Facemesh is ready, tells Facemesh what to do when
-it detects a face
-*/
 function modelLoaded() {
-    // We can switch states now
+    // switch state to detect
     state = STATE.DETECTING;
-    // Tell Facemesh what to do when it gets a face
     objectDetector.detect(img, gotResult);
 }
 
@@ -92,9 +79,6 @@ function draw() {
     conversation()
 }
 
-/**
-Tells the user we're loading Facemesh
-*/
 function startup() {
     background(0);
 
@@ -115,15 +99,6 @@ function detecting() {
     // If the user has dropped an image, show it
     if (img) {
         image(img, 0, 0, width, height);
-    }
-
-    // Go through all the noses and display them
-    for (let nose of noseData.noses) {
-        push();
-        textSize(48);
-        textAlign(CENTER, CENTER);
-        text(`👃`, nose.x, nose.y);
-        pop();
     }
 }
 
