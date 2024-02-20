@@ -8,21 +8,34 @@ author, and this description to match your project!
 
 "use strict";
 
+// Current state of program
+let state = `loading`; // loading, running
 // This will store the image we drop onto the canvas
 let img;
+// The name of our model
+let modelName = `CocoSsd`;
+// ObjectDetector object (using the name of the model for clarify)
+let cocossd;
+// // The current set of predictions made by CocoSsd once it's running
+// let predictions = undefined;
 
-// changing the state to when it finished loading
-const STATE = {
-    STARTUP: `STARTUP`,
-    DETECTING: `DETECTING`
-};
-let state = STATE.STARTUP;
+// The emoji mapping
+let emojis = undefined;
+
+//image name of NPC
+let char;
+
+let scene = 0;
+
+let predictions = [];
+let objects = ["flower"];
 
 /**
 Description of preload
 */
 function preload() {
-
+    emojis = loadJSON(`cocossd-emoji-mapping.json`);
+    char = loadImage('assets/images/image(1).png');
 }
 
 
@@ -30,82 +43,145 @@ function preload() {
 Description of setup
 */
 function setup() {
-    // Create our canvas and store it in a variable
-    let canvas = createCanvas(640, 480);
+    let canvas = createCanvas(500, 500);
+
     // Tell the canvas to call gotImageFile() when the user drops
     // a file onto it
     canvas.drop(gotImageFile);
 
-    objectDetector = ml5.objectDetector(`yolo`, modelLoaded);
+    // Create out object detector
+    cocossd = ml5.objectDetector('cocossd', modelReady);
+}
+
+function modelReady() {
+    state = `running`;
 }
 
 /**
 Loads the dropped file (assumes it's an image) into an HTML img
-element and then runs Facemesh on the image
+element and then runs object detection on the image
 */
 function gotImageFile(file) {
-    img = createImg(file.data, `User image`);
-    img.size(width, height);
+    // Don't take the image file if the model isn't ready
+    if (state !== `running`) {
+        return;
+    }
+
+    // Create an img element from the dropped file
+    // (including alt text)
+    img = createImg(file.data, `User image`, ``, imageReady);
+    // Hide it because we don't want the HTML element visible
     img.hide();
 }
 
-function modelLoaded() {
-    // switch state to detect
-    state = STATE.DETECTING;
-    objectDetector.detect(img, gotResult);
-}
-
-function gotResult(err, results) {
-    if (err) {
-        console.log(err);
-    }
-    console.log(results)
-    objects = results;
+/**
+Called when the image is actually ready
+*/
+function imageReady() {
+    // There may be some issues around mismatching dimensions here
+    img.size(width, AUTO);
+    // Ask CocoSsd to detect objects, calls gotResults
+    // if it finds something
+    cocossd.detect(img, gotResults);
 }
 
 /**
-Description of draw()
+Called when CocoSsd has detected at least one object in the video feed
 */
-function draw() {
-    switch (state) {
-        case STATE.STARTUP:
-            startup();
-            break;
-        case STATE.DETECTING:
-            detecting();
-            break;
+function gotResults(err, results) {
+    // If there's an error, report it
+    if (err) {
+        console.error(err);
     }
-
-    conversation()
+    // Otherwise, save the results into our predictions array
+    else {
+        predictions = results;
+    }
 }
 
-function startup() {
-    background(0);
+/**
+Handles the two states of the program: loading, running
+*/
+function draw() {
+    if (state === `loading`) {
+        loading();
+    }
+    else if (state === `running`) {
+        running();
+    }
+}
+
+/**
+Displays a simple loading screen with the loading model's name
+*/
+function loading() {
+    background(255);
 
     push();
-    fill(255);
+    textSize(32);
+    textStyle(BOLD);
     textAlign(CENTER, CENTER);
-    textSize(48);
-    text(`Loading...`, width / 2, height / 2);
+    text(`Loading ${modelName}...`, width / 2, height / 2);
     pop();
 }
 
 /**
-Shows the canvas or current image and current nose
+If there are currently objects detected it displays them as emoji
 */
-function detecting() {
-    background(200, 127, 120);
+function running() {
+    background(0);
+    characterTalk()
 
-    // If the user has dropped an image, show it
-    if (img) {
-        image(img, 0, 0, width, height);
+    if (predictions) {
+
+        // If so run through the array of predictions
+        for (let i = 0; i < predictions.length; i++) {
+            // Get the object predicted
+            let object = predictions[i];
+
+            // Display it on the canvas
+            // displayObject(object);
+
+            if (predictions[i].label == "flower" && predictions[i].confidence >= 0.5) {
+                scene++
+            }
+
+            if (predictions[i].label !== "flower" && predictions[i].confidence >= 0.5) {
+                scene = 2;
+            }
+        }
     }
+
+
 }
 
-function conversation() {
-    push()
-    fill(255, 0, 100)
-    rect(100, 100, 100, 100)
+// /**
+// Provided with a detected object it draws an emoji representation of that object at its position.
+// */
+// function displayObject(object) {
+//     // Get the emoji for this object label (from the JSON)
+//     let emoji = emojis[object.label];
 
+//     // There are a couple of objects I couldn't find good emoji for, so check first
+//     if (emoji) {
+//         push();
+//         textAlign(CENTER, CENTER);
+//         // Set the text size based on the height
+//         // to scale
+//         textSize(object.height);
+//         // A little transparency for overlapping objects
+//         fill(0, 200);
+//         // Display the emoji in the centre of the detected object
+//         text(emoji, object.x + object.width / 2, object.y + object.height / 2);
+//         pop();
+//     }
+// }
+
+function characterTalk() {
+    push()
+    imageMode(CENTER)
+    image(char, 250, 250, 200, 200)
+    fill(255)
+    text(scenes[scene].text, 100, 100, 100, 100);
     pop()
 }
