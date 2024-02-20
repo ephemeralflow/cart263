@@ -4,6 +4,8 @@ Author Name
 
 This is a template. You must fill in the title,
 author, and this description to match your project!
+https://cocodataset.org/#explore
+THE COCOSSD DATABASE TO KNOW WHAT IT CAN DETECT BECAUSE FLOWERS AINT ONE OF THEM
 */
 
 "use strict";
