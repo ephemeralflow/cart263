@@ -28,7 +28,7 @@ let char;
 let scene = 0;
 
 let predictions = [];
-let objects = ["flower"];
+let objects = ["rose"];
 
 /**
 Description of preload
@@ -131,6 +131,7 @@ If there are currently objects detected it displays them as emoji
 function running() {
     background(0);
     characterTalk()
+    console.log(predictions)
 
     if (predictions) {
 
@@ -142,11 +143,11 @@ function running() {
             // Display it on the canvas
             // displayObject(object);
 
-            if (predictions[i].label == "flower" && predictions[i].confidence >= 0.5) {
-                scene++
+            if (predictions[i].label == "rose" && predictions[i].confidence > 0.5) {
+                scene = 1;
             }
 
-            if (predictions[i].label !== "flower" && predictions[i].confidence >= 0.5) {
+            if (predictions[i].label !== "rose" && predictions[i].confidence < 0.5) {
                 scene = 2;
             }
         }
