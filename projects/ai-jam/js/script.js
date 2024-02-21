@@ -30,7 +30,7 @@ let char;
 let scene = 0;
 
 let predictions = [];
-let objects = ["rose"];
+let objects = ["teddy bear", "cat", "dog", "bird", "person"];
 
 /**
 Description of preload
@@ -137,54 +137,131 @@ function running() {
 
     if (predictions) {
 
-        // If so run through the array of predictions
+        // // If so run through the array of predictions
+        // for (let i = 0; i < predictions.length; i++) {
+        //     // Get the object predicted
+        //     let object = predictions[i];
+
+        //     if (object.label == ("dog" || "cat" || "bird") && object.confidence > 0.5) {
+        //         scene = 3;
+        //     }
+
+        //     if (object.label == "person" && object.confidence > 0.5) {
+        //         scene = 4;
+        //     }
+        // }
         for (let i = 0; i < predictions.length; i++) {
-            // Get the object predicted
             let object = predictions[i];
 
-            // Display it on the canvas
-            // displayObject(object);
+            if (scene === 1) {
+                if (object.label == ("potted plant" || "vase") && object.confidence > 0.5) {
+                    scene = 2;
+                }//or vase.........
 
-            if (predictions[i].label == "rose" && predictions[i].confidence > 0.5) {
-                scene = 1;
+                if (object.label == "teddy bear" && object.confidence > 0.5) {
+                    scene = 3;
+                }
+
+                if (object.label !== ("teddy bear" || "potted plant" || "vase") && object.confidence > 0.5) {
+                    scene = 4;
+                }
             }
 
-            if (predictions[i].label !== "rose" && predictions[i].confidence < 0.5) {
-                scene = 2;
+            if (scene === 8) {
+
+                if (object.label == ("dog" || "cat" || "bird") && object.confidence > 0.5) {
+                    scene = 9;
+                }
+
+                if (object.label == ("donut" || "cake") && object.confidence > 0.5) {
+                    scene = 10;
+                }
+
+                if (object.label == "pizza" && object.confidence > 0.5) {
+                    scene = 11;
+                }
+
+                if (object.label !== ("dog" || "cat" || "bird" || "donut" || "cake" || "pizza") && object.confidence > 0.5) {
+                    scene = 12;
+                }
             }
+
+
         }
+
+
+
     }
-
-
 }
 
-// /**
-// Provided with a detected object it draws an emoji representation of that object at its position.
-// */
-// function displayObject(object) {
-//     // Get the emoji for this object label (from the JSON)
-//     let emoji = emojis[object.label];
-
-//     // There are a couple of objects I couldn't find good emoji for, so check first
-//     if (emoji) {
-//         push();
-//         textAlign(CENTER, CENTER);
-//         // Set the text size based on the height
-//         // to scale
-//         textSize(object.height);
-//         // A little transparency for overlapping objects
-//         fill(0, 200);
-//         // Display the emoji in the centre of the detected object
-//         text(emoji, object.x + object.width / 2, object.y + object.height / 2);
-//         pop();
-//     }
-// }
-
 function characterTalk() {
+    textFont('Courier New');
+
+    push()
+    fill(255, 255, 255, 150)
+    rectMode(CENTER)
+    rect(250, 430, 450, 100)
+    pop()
     push()
     imageMode(CENTER)
     image(char, 250, 250, 200, 200)
+    fill(0)
+    textSize(20)
+    text(scenes[scene].text, 50, 400, 430, 100);
     fill(255)
-    text(scenes[scene].text, 100, 100, 100, 100);
+    textSize(15)
+    text(scenes[scene].hint, 30, 360, 450, 100)
     pop()
+
+    if (scene === 0) {
+        push();
+        fill(255, 255, 255, 150);
+        rectMode(CENTER);
+        strokeWeight(2)
+        rect(width / 2, height / 2, 250, 55);
+        fill(0)
+        textAlign(CENTER)
+        textSize(20)
+        text("What's wrong?", width / 2, 255)
+        pop();
+    }
+
+    if (scene === 7) {
+        push();
+        fill(255, 255, 255, 150);
+        rectMode(CENTER);
+        strokeWeight(2)
+        rect(width / 2, height / 2, 250, 55);
+        fill(0)
+        textAlign(CENTER)
+        textSize(20)
+        text("Are you okay?", width / 2, 255)
+        pop();
+    }
+
+    if (scene === 5 || scene === 6) {
+        push()
+        fill(0)
+        rect(0, 0, 500, 500)
+        text(50)
+        textAlign(CENTER)
+        fill(255)
+        text("Some time later...", 250, 250)
+        pop()
+    }
+}
+
+function mousePressed() {
+
+    if (mouseX >= 126 && mouseX <= 374 && mouseY >= 222 && mouseY <= 277 && (scene === 0 || scene === 7)) {
+        scene++;
+    }
+
+    if (scene === 2 || scene === 3 || scene === 4) {
+        scene = 5
+    }
+
+    if (scene === 5 || scene === 6) {
+        scene++
+    }
 }
