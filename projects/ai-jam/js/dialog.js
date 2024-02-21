@@ -36,6 +36,10 @@ let scenes = [{
     hint: "Hint: try to make her happy again. (food, pets, plushes?)" //8
 }, {
     name: "NPC",
+    text: "A teddy bear... so cute... I'll hug it gently, it's the only thing that won't make me cry right now!!!",
+    hint: " "
+}, {
+    name: "NPC",
     text: "Awwwww where did you come little buddy... Are you here to comfort me..?",
     hint: " "
 }, {

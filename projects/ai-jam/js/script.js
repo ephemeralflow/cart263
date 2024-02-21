@@ -128,35 +128,21 @@ function loading() {
 }
 
 /**
-If there are currently objects detected it displays them as emoji
+Not only does it call for the character image and the text, it also makes it that when you insert an image object, to do a following command.
 */
 function running() {
-    background(0);
+    background(180, 140, 150);
     characterTalk()
     console.log(predictions)
 
     if (predictions) {
-
-        // // If so run through the array of predictions
-        // for (let i = 0; i < predictions.length; i++) {
-        //     // Get the object predicted
-        //     let object = predictions[i];
-
-        //     if (object.label == ("dog" || "cat" || "bird") && object.confidence > 0.5) {
-        //         scene = 3;
-        //     }
-
-        //     if (object.label == "person" && object.confidence > 0.5) {
-        //         scene = 4;
-        //     }
-        // }
         for (let i = 0; i < predictions.length; i++) {
             let object = predictions[i];
 
             if (scene === 1) {
                 if (object.label == ("potted plant" || "vase") && object.confidence > 0.5) {
                     scene = 2;
-                }//or vase.........
+                }
 
                 if (object.label == "teddy bear" && object.confidence > 0.5) {
                     scene = 3;
@@ -169,29 +155,30 @@ function running() {
 
             if (scene === 8) {
 
-                if (object.label == ("dog" || "cat" || "bird") && object.confidence > 0.5) {
+                if (object.label == "teddy bear" && object.confidence > 0.5) {
                     scene = 9;
                 }
 
-                if (object.label == ("donut" || "cake") && object.confidence > 0.5) {
+                if (object.label == ("dog" || "cat" || "bird") && object.confidence > 0.5) {
                     scene = 10;
                 }
 
-                if (object.label == "pizza" && object.confidence > 0.5) {
+                if (object.label == ("donut" || "cake") && object.confidence > 0.5) {
                     scene = 11;
                 }
 
-                if (object.label !== ("dog" || "cat" || "bird" || "donut" || "cake" || "pizza") && object.confidence > 0.5) {
+                if (object.label == "pizza" && object.confidence > 0.5) {
                     scene = 12;
                 }
+
+                if (object.label !== ("teddy bear" || "dog" || "cat" || "bird" || "donut" || "cake" || "pizza") && object.confidence > 0.5) {
+                    scene = 13;
+                }
             }
-
-
         }
-
-
-
     }
+
+    predictions = [];
 }
 
 function characterTalk() {
@@ -207,7 +194,7 @@ function characterTalk() {
     image(char, 250, 250, 200, 200)
     fill(0)
     textSize(20)
-    text(scenes[scene].text, 50, 400, 430, 100);
+    text(scenes[scene].text, 50, 390, 430, 100);
     fill(255)
     textSize(15)
     text(scenes[scene].hint, 30, 360, 450, 100)
