@@ -140,38 +140,36 @@ function running() {
             let object = predictions[i];
 
             if (scene === 1) {
-                if (object.label == ("potted plant" || "vase") && object.confidence > 0.5) {
+                if (["potted plant", "vase"].includes(object.label) && object.confidence > 0.5) {
                     scene = 2;
                 }
-
-                if (object.label == "teddy bear" && object.confidence > 0.5) {
+                else if (["teddy bear"].includes(object.label) && object.confidence > 0.5) {
                     scene = 3;
                 }
-
-                if (object.label !== ("teddy bear" || "potted plant" || "vase") && object.confidence > 0.5) {
+                else if (!["teddy bear", "potted plant", "vase"].includes(object.label) && object.confidence > 0.5) {
                     scene = 4;
                 }
             }
 
             if (scene === 8) {
 
-                if (object.label == "teddy bear" && object.confidence > 0.5) {
+                if (["teddy bear"].includes(object.label) && object.confidence > 0.5) {
                     scene = 9;
                 }
 
-                if (object.label == ("dog" || "cat" || "bird") && object.confidence > 0.5) {
+                if (["dog", "cat", "bird"].includes(object.label) && object.confidence > 0.5) {
                     scene = 10;
                 }
 
-                if (object.label == ("donut" || "cake") && object.confidence > 0.5) {
+                if (["donut", "cake"].includes(object.label) && object.confidence > 0.5) {
                     scene = 11;
                 }
 
-                if (object.label == "pizza" && object.confidence > 0.5) {
+                if (["pizza"].includes(object.label) && object.confidence > 0.5) {
                     scene = 12;
                 }
 
-                if (object.label !== ("teddy bear" || "dog" || "cat" || "bird" || "donut" || "cake" || "pizza") && object.confidence > 0.5) {
+                if (!["teddy bear", "dog", "cat", "bird", "donut", "cake", "pizza"].includes(object.label) && object.confidence && object.confidence > 0.5) {
                     scene = 13;
                 }
             }

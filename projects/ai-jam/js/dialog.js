@@ -54,4 +54,20 @@ let scenes = [{
     name: "NPC",
     text: "What even is that, are you trying to make this pretty girl cry???",
     hint: " "
+}, {
+    name: "NPC",
+    text: " ",
+    hint: " "
+}, {
+    name: "NPC",
+    text: " ",
+    hint: " "
+}, {
+    name: "NPC",
+    text: "Why are you just staring at me..?",
+    hint: " " //16
+}, {
+    name: "NPC",
+    text: "Do you even care..?",
+    hint: " "
 }]
