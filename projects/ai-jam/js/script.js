@@ -14,30 +14,34 @@ THE COCOSSD DATABASE TO KNOW WHAT IT CAN DETECT BECAUSE FLOWERS AINT ONE OF THEM
 let state = `loading`; // loading, running
 // This will store the image we drop onto the canvas
 let img;
-// The name of our model
-let modelName = `CocoSsd`;
 // ObjectDetector object (using the name of the model for clarify)
 let cocossd;
-// // The current set of predictions made by CocoSsd once it's running
-// let predictions = undefined;
 
-// The emoji mapping
-let emojis = undefined;
-
-//image name of NPC
-let char;
-
+//variable to know at which scene the game is on (mostly for dialogue and to insert parts in certain scenes)
 let scene = 0;
 
+//Array to hold what predictions CocoSsd would have
 let predictions = [];
-let objects = ["teddy bear", "cat", "dog", "bird", "person"];
+
+//Sprite labels
+let elyPensive;
+let elySad;
+let elySmile;
+let elySob;
+let elyHappyCry;
+
+//Variable to hold the mood for the endings
+let elyMood = 1;
 
 /**
-Description of preload
+Pre-loading the images used later on
 */
 function preload() {
-    emojis = loadJSON(`cocossd-emoji-mapping.json`);
-    char = loadImage('assets/images/image(1).png');
+    elyPensive = loadImage('assets/images/pensive.png');
+    elySad = loadImage('assets/images/sad.png');
+    elySmile = loadImage('assets/images/happy.png');
+    elySob = loadImage('assets/images/sob.png');
+    elyHappyCry = loadImage('assets/images/happycry.png');
 }
 
 
@@ -123,7 +127,7 @@ function loading() {
     textSize(32);
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
-    text(`Loading ${modelName}...`, width / 2, height / 2);
+    text(`Loading game...`, width / 2, height / 2);
     pop();
 }
 
@@ -131,74 +135,93 @@ function loading() {
 Not only does it call for the character image and the text, it also makes it that when you insert an image object, to do a following command.
 */
 function running() {
+
+    //Sets up the background as well as the character functions
     background(180, 140, 150);
     characterTalk()
-    console.log(predictions)
 
     if (predictions) {
         for (let i = 0; i < predictions.length; i++) {
             let object = predictions[i];
 
-            if (scene === 1) {
+            //If the scene is 2, make it that it actually does read what you drag inside the game itself, depending on what you drag in, it will do a different thing such as change the scene to the respective scene/reaction of the character, but also change the mood of the character depending on the object given.
+            if (scene === 2) {
                 if (["potted plant", "vase"].includes(object.label) && object.confidence > 0.5) {
-                    scene = 2;
-                }
-                else if (["teddy bear"].includes(object.label) && object.confidence > 0.5) {
+                    elyMood = elyMood + 0.5;
                     scene = 3;
                 }
-                else if (!["teddy bear", "potted plant", "vase"].includes(object.label) && object.confidence > 0.5) {
+                else if (["teddy bear"].includes(object.label) && object.confidence > 0.5) {
+                    elyMood = elyMood + 0.5;
                     scene = 4;
+                }
+                else if (!["teddy bear", "potted plant", "vase"].includes(object.label) && object.confidence > 0.5) {
+                    elyMood = elyMood - 0.5;
+                    scene = 5;
                 }
             }
 
-            if (scene === 8) {
+            if (scene === 9) {
 
                 if (["teddy bear"].includes(object.label) && object.confidence > 0.5) {
-                    scene = 9;
-                }
-
-                if (["dog", "cat", "bird"].includes(object.label) && object.confidence > 0.5) {
+                    elyMood = elyMood + 0.5;
                     scene = 10;
                 }
 
-                if (["donut", "cake"].includes(object.label) && object.confidence > 0.5) {
+                if (["dog", "cat", "bird"].includes(object.label) && object.confidence > 0.5) {
+                    elyMood = elyMood + 0.5;
                     scene = 11;
                 }
 
-                if (["pizza"].includes(object.label) && object.confidence > 0.5) {
+                if (["donut", "cake"].includes(object.label) && object.confidence > 0.5) {
+                    elyMood = elyMood + 0.5;
                     scene = 12;
                 }
 
-                if (!["teddy bear", "dog", "cat", "bird", "donut", "cake", "pizza"].includes(object.label) && object.confidence && object.confidence > 0.5) {
+                if (["pizza"].includes(object.label) && object.confidence > 0.5) {
+                    elyMood = elyMood + 0.5;
                     scene = 13;
+                }
+
+                if (!["teddy bear", "dog", "cat", "bird", "donut", "cake", "pizza"].includes(object.label) && object.confidence && object.confidence > 0.5) {
+                    elyMood = elyMood - 0.5;
+                    scene = 14;
                 }
             }
         }
     }
 
+    //Empties the prediction array as to not have an error later on and skip a scene accidentally.
     predictions = [];
 }
 
 function characterTalk() {
+    //Changes the font of the game
     textFont('Courier New');
 
+    //Displays the cahracter and the text box
     push()
+    characterSprite()
     fill(255, 255, 255, 150)
     rectMode(CENTER)
     rect(250, 430, 450, 100)
     pop()
+
+    //Display the text inside the text box, also displays the hint part of the game
     push()
-    imageMode(CENTER)
-    image(char, 250, 250, 200, 200)
     fill(0)
     textSize(20)
-    text(scenes[scene].text, 50, 390, 430, 100);
+    text(scenes[scene].text, 50, 385, 430, 100);
     fill(255)
     textSize(15)
-    text(scenes[scene].hint, 30, 360, 450, 100)
+    stroke(0)
+    strokeWeight(2)
+    textStyle(BOLD)
+    textAlign(CENTER)
+    text(scenes[scene].hint, 0, 20, 500, 100)
     pop()
 
-    if (scene === 0) {
+    //Display the text and boxes for the choices offered
+    if (scene === 1) {
         push();
         fill(255, 255, 255, 150);
         rectMode(CENTER);
@@ -211,7 +234,7 @@ function characterTalk() {
         pop();
     }
 
-    if (scene === 7) {
+    if (scene === 8) {
         push();
         fill(255, 255, 255, 150);
         rectMode(CENTER);
@@ -224,7 +247,7 @@ function characterTalk() {
         pop();
     }
 
-    if (scene === 5 || scene === 6) {
+    if (scene === 6 || scene === 7) {
         push()
         fill(0)
         rect(0, 0, 500, 500)
@@ -234,19 +257,119 @@ function characterTalk() {
         text("Some time later...", 250, 250)
         pop()
     }
+
+    //Call the ending sequence on top of everything
+    ending()
+}
+
+/*
+Display the character sprites depending on the scenes
+*/
+function characterSprite() {
+    if (scene === 1 || scene === 5 || scene === 15) {
+        imageMode(CENTER)
+        image(elyPensive, width / 2, height / 2)
+    }
+
+    if (scene === 2 || scene === 9) {
+        imageMode(CENTER)
+        image(elySad, width / 2, height / 2)
+    }
+
+    if (scene === 3 || scene === 4 || scene === 17 || scene === 18) {
+        imageMode(CENTER)
+        image(elySmile, width / 2, height / 2)
+    }
+
+    if (scene === 8 || scene === 14 || scene === 20) {
+        imageMode(CENTER)
+        image(elySob, width / 2, height / 2)
+    }
+
+    if (scene >= 10 && scene <= 13) {
+        imageMode(CENTER)
+        image(elyHappyCry, width / 2, height / 2)
+    }
 }
 
 function mousePressed() {
 
-    if (mouseX >= 126 && mouseX <= 374 && mouseY >= 222 && mouseY <= 277 && (scene === 0 || scene === 7)) {
+    //If the mouse is pressed on these scenes, go up one scene (in other words, the scene right after the one that it's on)
+    if (scene === 0 || scene === 6 || scene === 7 || scene === 15 || scene === 17 || scene === 18 || scene === 20) {
+        scene++
+    }
+
+    //if the mouse is pressed on either of these scenes (which are the ones after inserting an image) go to the scene that is after all of the above
+    if (scene === 3 || scene === 4 || scene === 5) {
+        scene = 6
+    }
+
+    //if the mouse is pressed during the final scenes in which you insert an image, the following endings can happen depending on the mood counter
+    if (scene >= 10 && scene <= 14) {
+        //If you got one wrong answer, you will get the neutral ending
+        if (elyMood === 1) {
+            scene = 15;
+        }
+
+        //If you got all good answers, you will get the good ending
+        else if (elyMood === 2) {
+            scene = 17;
+        }
+
+        //If you got all bad answers, you will get the bad ending
+        else if (elyMood === 0) {
+            scene = 20;
+        };
+    }
+
+    //If you press the mouse in these specific scenes in these specific coordinates, you can press the (singular) choice
+    if (mouseX >= 126 && mouseX <= 374 && mouseY >= 222 && mouseY <= 277 && (scene === 1 || scene === 8)) {
         scene++;
     }
 
-    if (scene === 2 || scene === 3 || scene === 4) {
-        scene = 5
+}
+
+/*
+Ending cards, depending on the scene, you will get a different ending card
+*/
+function ending() {
+
+    if (scene === 19) {
+        push()
+        fill(50, 0, 10)
+        rectMode(CORNER)
+        rect(0, 0, 500, 500)
+
+        fill(255)
+        textSize(50)
+        textAlign(CENTER)
+        text("GOOD END", width / 2, height / 2)
+        pop()
     }
 
-    if (scene === 5 || scene === 6) {
-        scene++
+    if (scene === 16) {
+        push()
+        fill(0, 50, 10)
+        rectMode(CORNER)
+        rect(0, 0, 500, 500)
+
+        fill(255)
+        textSize(50)
+        textAlign(CENTER)
+        text("NEUTRAL END", width / 2, height / 2)
+        pop()
+    }
+
+    if (scene === 21) {
+        push()
+        fill(10, 0, 50)
+        rectMode(CORNER)
+        rect(0, 0, 500, 500)
+
+        fill(255)
+        textSize(50)
+        textAlign(CENTER)
+        text("BAD END", width / 2, height / 2)
+        pop()
     }
 }
