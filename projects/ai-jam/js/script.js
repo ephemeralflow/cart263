@@ -1,11 +1,8 @@
 /**
-Title of Project
-Author Name
+Date Struggles
+Scarlett Perez
 
-This is a template. You must fill in the title,
-author, and this description to match your project!
-https://cocodataset.org/#explore
-THE COCOSSD DATABASE TO KNOW WHAT IT CAN DETECT BECAUSE FLOWERS AINT ONE OF THEM
+It's a drag and drop simulation basically, you help Ely recover from her failed date (at first helping her go on said date). Depending on what you give her, she gives different responses
 */
 
 "use strict";
