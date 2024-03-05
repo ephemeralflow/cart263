@@ -126,3 +126,6 @@ class Play extends Phaser.Scene {
         this.anims.create(idleAnimationConfig);
     }
 }
+
+// undefined, this.(state).this
+//https://blog.ourcade.co/posts/2020/phaser3-fog-of-war-field-of-view-roguelike/
