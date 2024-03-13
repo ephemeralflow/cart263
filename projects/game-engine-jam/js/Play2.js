@@ -1,26 +1,15 @@
-class Play extends Phaser.Scene {
+class Play2 extends Phaser.Scene {
     constructor() {
         super({
-            key: "play"
+            key: "play2"
         })
     }
 
     text;
 
     create() {
-        // this.cameras.main.setBounds(0, 0, 1920 * 2, 1080 * 2);
-        this.cameras.main.setBounds(0, 0, 800, 800);
-        this.physics.world.setBounds(0, 0, 800, 800);
-
-        let map = this.make.tilemap({ key: "mapTest" })
-        let waterBase = map.addTilesetImage("Water", "waterImage");
-        let grassBase = map.addTilesetImage("Grass", "grassImage");
-        let fencesBase = map.addTilesetImage("Fences", "fencesImage");
-        // let miscBase = map.addTilesetImage("Misc", "miscImage");
-        let layer = map.createLayer("water", waterBase, 0, 0);
-        let ground = map.createLayer("ground", grassBase, 0, 0);
-        let fence = map.createLayer("highestlayer", fencesBase, 0, 0);
-        // let toplayer = map.createLayer("highestlayer", miscBase, 0, 0);
+        this.cameras.main.setBounds(0, 0, 500 * 2, 500 * 2);
+        this.physics.world.setBounds(0, 0, 500 * 2, 500 * 2);
 
         this.trees = this.physics.add.group({
 
@@ -30,6 +19,7 @@ class Play extends Phaser.Scene {
 
             quantity: 455,
         });
+        //this.scene.start("NAME OF SCENE");
 
         //TREES
         this.trees.children.each(function (tree) {
@@ -38,7 +28,7 @@ class Play extends Phaser.Scene {
             // Set the position of the current wall
             tree.setPosition(x, y);
             // Set the tint of the current wall
-            // tree.setTint(`0xdd3333`);
+            tree.setTint(`0xdd3333`);
         }, this);
 
         this.specialTree = this.physics.add.group({
@@ -63,18 +53,18 @@ class Play extends Phaser.Scene {
             dialogTestS.setTint(`0x3333dd`);
         }, this);
 
-        // // Create a sadness emoji in a random position
-        // this.sadness = this.physics.add.sprite(0, 0, `tree`);
-        // this.sadness.setTint(0xff0000);
-        // // Note how we can use RandomRectangle() here if we put the object we want
-        // // to reposition randomly in an array!
-        // Phaser.Actions.RandomRectangle([this.sadness], this.physics.world.bounds);
+        // Create a sadness emoji in a random position
+        this.sadness = this.physics.add.sprite(0, 0, `tree`);
+        this.sadness.setTint(0xff0000);
+        // Note how we can use RandomRectangle() here if we put the object we want
+        // to reposition randomly in an array!
+        Phaser.Actions.RandomRectangle([this.sadness], this.physics.world.bounds);
 
 
         this.avatar = this.physics.add.sprite(200, 200, `avatar`);
 
         this.physics.add.collider(this.avatar, this.trees);
-        this.physics.add.collider(this.avatar, this.specialTree, this.changeScene, null, this);
+        this.physics.add.collider(this.avatar, this.specialTree);
         this.physics.add.collider(this.avatar, this.dialogTest, this.dialogBoxFunction, null, this);
 
         this.physics.add.overlap(this.avatar, this.collectables, this.collectItem, null, this);
@@ -123,10 +113,6 @@ class Play extends Phaser.Scene {
         Phaser.Actions.RandomRectangle([dialogTest], this.physics.world.bounds);
 
         this.displaySadDialog();
-    }
-
-    changeScene() {
-        this.scene.start("play2");
     }
 
     displaySadDialog() {
