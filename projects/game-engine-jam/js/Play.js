@@ -6,24 +6,43 @@ class Play extends Phaser.Scene {
     }
 
     text;
+    textNumber = 1;
 
     create() {
         // this.cameras.main.setBounds(0, 0, 1920 * 2, 1080  * 2);
-        this.cameras.main.setBounds(0, 0, 500 * 2, 400 * 2);
+        this.cameras.main.setBounds(0, 0, 480 * 2, 480 * 2);
         this.physics.world.setBounds(0, 0, 400 * 2, 400 * 2);
 
         let map = this.make.tilemap({ key: "mapTest" })
-        let waterBase = map.addTilesetImage("Water", "waterImage");
+
+        let tileset = map.addTilesetImage("Water", "waterImage");
+        map.createLayer("water", tileset);
+
         let grassBase = map.addTilesetImage("Grass", "grassImage");
+
         let fencesBase = map.addTilesetImage("Fences", "fencesImage");
         let bridgeBase = map.addTilesetImage("Wood_Bridge", "bridgeImage");
         // let miscBase = map.addTilesetImage("Misc", "miscImage");
-        let layer = map.createLayer("water", waterBase, 0, 0);
+
         let ground = map.createLayer("ground", grassBase, 0, 0);
-        let fence = map.createLayer("highestlayer", fencesBase, 0, 0);
+        let fence = map.createLayer("highestlayer", fencesBase);
         let bridge = map.createLayer("bridge", bridgeBase, 0, 0);
         // let toplayer = map.createLayer("highestlayer", miscBase, 0, 0);
-        fence.setCollisionByExclusion([-1]);
+        // fence.setCollisionByExclusion([-1]);
+
+        this.avatar = this.physics.add.sprite(150, 100, `avatar`);
+        this.npc1 = this.physics.add.sprite(250, 105, "npc1").setImmovable(true);
+
+        this.npc1.setSize(10, 20, true)
+        this.avatar.setSize(16, 28, true)
+
+        this.physics.add.collider(this.avatar, fence);
+        fence.setCollisionBetween(1, 2)
+
+        // fence.setCollisionByProperty({ collides: true });
+        ground.setCollisionByProperty({ collides: true });
+
+        // this.avatar.setCollideWorldBounds(true);
 
 
         this.trees = this.physics.add.group({
@@ -45,6 +64,22 @@ class Play extends Phaser.Scene {
         //     // tree.setTint(`0xdd3333`);
         // }, this);
 
+        // COLLECTABLES
+        this.collectables = this.physics.add.group({
+            key: 'tree',
+            quantity: 9
+        });
+
+        this.collectables.children.each(function (collectable) {
+            // let x = Phaser.Math.Between(400, this.sys.canvas.height);
+            // let y = Phaser.Math.Between(1100, this.sys.canvas.height);
+
+            let x = Phaser.Math.Between(400, 600);
+            let y = Phaser.Math.Between(700, 900);
+            collectable.setPosition(x, y);
+            collectable.setTint(`0x3333dd`);
+        }, this);
+
         this.specialTree = this.physics.add.group({
             key: 'tree',
             quantity: 1,
@@ -52,14 +87,14 @@ class Play extends Phaser.Scene {
         });
 
         this.specialTree.children.each(function (specialTreeS) {
-            specialTreeS.setPosition(500, 450);
+            specialTreeS.setPosition(480, 460);
             specialTreeS.setTint(`0xdd3333`);
         }, this);
 
         this.dialogTest = this.physics.add.group({
             key: 'tree',
             quantity: 1,
-            // immovable: true,
+            immovable: true,
         });
 
         this.dialogTest.children.each(function (dialogTestS) {
@@ -67,30 +102,19 @@ class Play extends Phaser.Scene {
             dialogTestS.setTint(`0x3333dd`);
         }, this);
 
-        // // Create a sadness emoji in a random position
-        // this.sadness = this.physics.add.sprite(0, 0, `tree`);
-        // this.sadness.setTint(0xff0000);
-        // // Note how we can use RandomRectangle() here if we put the object we want
-        // // to reposition randomly in an array!
-        // Phaser.Actions.RandomRectangle([this.sadness], this.physics.world.bounds);
-
-
-        this.avatar = this.physics.add.sprite(150, 100, `avatar`);
-
-        this.physics.add.collider(this.avatar, this.trees);
+        // this.physics.add.collider(this.avatar, this.trees);
         this.physics.add.collider(this.avatar, this.specialTree, this.changeScene, null, this);
         this.physics.add.collider(this.avatar, this.dialogTest, this.dialogBoxFunction, null, this);
+        this.physics.add.collider(this.avatar, this.npc1);
 
-        this.physics.add.collider(this.avatar, fence);
+
 
         this.physics.add.overlap(this.avatar, this.collectables, this.collectItem, null, this);
 
         {
             //  Implicit values
             const config1 = {
-                x: 100,
-                y: 100,
-                text: 'TEST DIALOGUE',
+                text: 'hi im a tree',
                 style: {
                     fontSize: '64px',
                     fontFamily: 'Arial',
@@ -111,9 +135,10 @@ class Play extends Phaser.Scene {
             this.dialogBox.setVisible(false);
         }
 
-        // this.createAnimations();
+        this.createAnimations();
 
-        // this.avatar.play(`idle`);
+        this.avatar.play(`idle`);
+        this.npc1.play("npcIdle1", true)
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -144,10 +169,6 @@ class Play extends Phaser.Scene {
         Called when the avatar overlaps the sadness, moves the sadness to a new random  position.
         */
     dialogBoxFunction(avatar, dialogTest) {
-        // Note how we can use RandomRectangle() again here if we put the object we want
-        // to reposition randomly in an array!
-        Phaser.Actions.RandomRectangle([dialogTest], this.physics.world.bounds);
-
         this.displaySadDialog();
     }
 
@@ -158,6 +179,7 @@ class Play extends Phaser.Scene {
     displaySadDialog() {
         // Display the dialog
         this.dialogBox.setVisible(true);
+        this.dialogBox.setPosition(100, 400);
         this.physics.pause();
     }
 
@@ -169,7 +191,7 @@ class Play extends Phaser.Scene {
     collectItem(avatar, item) {
         // NOTE: We'll keep it simple by just removing the collectable from the scene
         // using its .destroy() method!
-        // item.destroy();
+        item.destroy();
     }
 
     update() {
@@ -192,9 +214,11 @@ class Play extends Phaser.Scene {
         // EXAMPLE: https://phaser.io/examples/v3/view/input/keyboard/cursor-keys
         if (this.cursors.left.isDown) {
             this.avatar.setVelocityX(-100);
+            this.avatar.play('avatarWalkSideLeft', true);
         }
         else if (this.cursors.right.isDown) {
             this.avatar.setVelocityX(100);
+            this.avatar.play('avatarWalkSideRight', true);
         }
         else {
             // If neither left or right are pressed, stop moving on x
@@ -203,9 +227,11 @@ class Play extends Phaser.Scene {
 
         if (this.cursors.up.isDown) {
             this.avatar.setVelocityY(-100);
+            this.avatar.play('avatarWalkBack', true);
         }
         else if (this.cursors.down.isDown) {
             this.avatar.setVelocityY(100);
+            this.avatar.play('avatarWalkForward', true);
         }
         else {
             // If neither up or down are pressed, stop moving on y
@@ -213,42 +239,86 @@ class Play extends Phaser.Scene {
         }
 
 
-        // if (this.avatar.body.velocity.x !== 0 || this.avatar.body.velocity.y !== 0) {
-        //     this.avatar.play(`moving`, true);
-        // }
-        // // Otherwise it's not moving
-        // else {
-        //     this.avatar.play(`idle`, true);
-        // }
+        if (this.avatar.body.velocity.x !== 0 || this.avatar.body.velocity.y !== 0) {
+        }
+        // Otherwise it's not moving
+        else {
+            this.avatar.play(`idle`, true);
+        }
     }
 
 
 
     createAnimations() {
-        let movingAnimationConfig = {
-            key: `moving`,
-            frames: this.anims.generateFrameNumbers(`avatar`, {
-                start: 0,
-                end: 3
-            }),
-            frameRate: 30,
-            repeat: -1
-        };
-        this.anims.create(movingAnimationConfig);
+        // let movingAnimationConfig = {
+        //     key: `moving`,
+        //     frames: this.anims.generateFrameNumbers(`avatar`, {
+        //         start: 0,
+        //         end: 3
+        //     }),
+        //     frameRate: 30,
+        //     repeat: -1
+        // };
+        // this.anims.create(movingAnimationConfig);
 
-        let idleAnimationConfig = {
-            // NOTE: We need to use a different animation key of course
+        let idleAvatar = {
             key: `idle`,
             frames: this.anims.generateFrameNumbers(`avatar`, {
-                // NOTE: We're only going to use frame 0, so it's starts and ends there
-                start: 0,
-                end: 3
+                start: 27,
+                end: 28
             }),
-            // NOTE: No need to specify a frame rate for something that doesn't animate!
-            // NOTE: We'll repeat 0 times!
-            repeat: 0
+            frameRate: 2,
+            repeat: -1
         };
-        this.anims.create(idleAnimationConfig);
+        this.anims.create(idleAvatar);
+
+        let npcIdle1 = {
+            key: "npcIdle1",
+            frames: this.anims.generateFrameNumbers("npc1", { frames: [0, 1] }),
+            frameRate: 2,
+            repeat: -1
+        };
+        this.anims.create(npcIdle1);
+
+        let forwardAvatar = {
+            key: `avatarWalkForward`,
+            frames: this.anims.generateFrameNumbers(`avatar`, {
+                start: 0,
+                end: 8
+            }),
+            frameRate: 24,
+            repeat: -1
+        };
+        this.anims.create(forwardAvatar);
+
+        this.anims.create({
+            key: "avatarWalkBack",
+            frames: this.anims.generateFrameNumbers("avatar", { frames: [22, 23, 24, 25, 26] }),
+            frameRate: 24,
+            repeat: -1
+        })
+
+        let rightSideAvatar = {
+            key: `avatarWalkSideRight`,
+            frames: this.anims.generateFrameNumbers(`avatar`, {
+                start: 9,
+                end: 15
+            }),
+            frameRate: 16,
+            repeat: -1
+        };
+        this.anims.create(rightSideAvatar);
+
+        let leftSideAvatar = {
+            key: `avatarWalkSideLeft`,
+            frames: this.anims.generateFrameNumbers(`avatar`, {
+                start: 16,
+                end: 21
+            }),
+            frameRate: 16,
+            repeat: -1
+        };
+        this.anims.create(leftSideAvatar);
     }
 }
 

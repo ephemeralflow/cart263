@@ -21,6 +21,9 @@ class Play2 extends Phaser.Scene {
         });
         //this.scene.start("NAME OF SCENE");
 
+        this.npc2 = this.physics.add.sprite(350, 105, "npc2");
+
+
         //TREES
         this.trees.children.each(function (tree) {
             let x = Phaser.Math.Between(0, 3840);
@@ -95,9 +98,9 @@ class Play2 extends Phaser.Scene {
             this.dialogBox.setVisible(false);
         }
 
-        // this.createAnimations();
-
-        // this.avatar.play(`idle`);
+        this.createAnimations();
+        this.npc2.play("idleNPC2", true)
+        this.avatar.play(`idle`);
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -148,9 +151,11 @@ class Play2 extends Phaser.Scene {
         // EXAMPLE: https://phaser.io/examples/v3/view/input/keyboard/cursor-keys
         if (this.cursors.left.isDown) {
             this.avatar.setVelocityX(-100);
+            this.avatar.play('avatarWalkSideLeft', true);
         }
         else if (this.cursors.right.isDown) {
             this.avatar.setVelocityX(100);
+            this.avatar.play('avatarWalkSideRight', true);
         }
         else {
             // If neither left or right are pressed, stop moving on x
@@ -159,9 +164,11 @@ class Play2 extends Phaser.Scene {
 
         if (this.cursors.up.isDown) {
             this.avatar.setVelocityY(-100);
+            this.avatar.play('avatarWalkBack', true);
         }
         else if (this.cursors.down.isDown) {
             this.avatar.setVelocityY(100);
+            this.avatar.play('avatarWalkForward', true);
         }
         else {
             // If neither up or down are pressed, stop moving on y
@@ -169,42 +176,23 @@ class Play2 extends Phaser.Scene {
         }
 
 
-        // if (this.avatar.body.velocity.x !== 0 || this.avatar.body.velocity.y !== 0) {
-        //     this.avatar.play(`moving`, true);
-        // }
-        // // Otherwise it's not moving
-        // else {
-        //     this.avatar.play(`idle`, true);
-        // }
+        if (this.avatar.body.velocity.x !== 0 || this.avatar.body.velocity.y !== 0) {
+        }
+        // Otherwise it's not moving
+        else {
+            this.avatar.play(`idle`, true);
+        }
     }
 
 
 
     createAnimations() {
-        let movingAnimationConfig = {
-            key: `moving`,
-            frames: this.anims.generateFrameNumbers(`avatar`, {
-                start: 0,
-                end: 3
-            }),
-            frameRate: 30,
+        this.anims.create({
+            key: "idleNPC2",
+            frames: this.anims.generateFrameNumbers("npc2", { frames: [0, 1, 2, 3] }),
+            frameRate: 2,
             repeat: -1
-        };
-        this.anims.create(movingAnimationConfig);
-
-        let idleAnimationConfig = {
-            // NOTE: We need to use a different animation key of course
-            key: `idle`,
-            frames: this.anims.generateFrameNumbers(`avatar`, {
-                // NOTE: We're only going to use frame 0, so it's starts and ends there
-                start: 0,
-                end: 3
-            }),
-            // NOTE: No need to specify a frame rate for something that doesn't animate!
-            // NOTE: We'll repeat 0 times!
-            repeat: 0
-        };
-        this.anims.create(idleAnimationConfig);
+        })
     }
 }
 
