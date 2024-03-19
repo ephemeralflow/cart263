@@ -77,7 +77,7 @@ class Play2 extends Phaser.Scene {
             const config1 = {
                 x: 100,
                 y: 100,
-                text: 'Text\nGame Object\nCreated from config',
+                text: 'Why are you here',
                 style: {
                     fontSize: '64px',
                     fontFamily: 'Arial',
