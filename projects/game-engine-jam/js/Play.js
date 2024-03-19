@@ -11,12 +11,12 @@ class Play extends Phaser.Scene {
     create() {
         // this.cameras.main.setBounds(0, 0, 1920 * 2, 1080  * 2);
         this.cameras.main.setBounds(0, 0, 480 * 2, 480 * 2);
-        this.physics.world.setBounds(0, 0, 400 * 2, 400 * 2);
+        this.physics.world.setBounds(0, 0, 480 * 2, 480 * 2);
 
         let map = this.make.tilemap({ key: "mapTest" })
 
         let tileset = map.addTilesetImage("Water", "waterImage");
-        map.createLayer("water", tileset);
+        let water = map.createLayer("water", tileset);
 
         let grassBase = map.addTilesetImage("Grass", "grassImage");
 
@@ -29,6 +29,7 @@ class Play extends Phaser.Scene {
         let bridge = map.createLayer("bridge", bridgeBase, 0, 0);
         // let toplayer = map.createLayer("highestlayer", miscBase, 0, 0);
         // fence.setCollisionByExclusion([-1]);
+        // water.setCollisionByExclusion([-1]);
 
         this.avatar = this.physics.add.sprite(150, 100, `avatar`);
         this.npc1 = this.physics.add.sprite(250, 105, "npc1").setImmovable(true);
@@ -37,12 +38,13 @@ class Play extends Phaser.Scene {
         this.avatar.setSize(16, 28, true)
 
         this.physics.add.collider(this.avatar, fence);
-        fence.setCollisionBetween(1, 2)
+        this.physics.add.collider(this.avatar, water);
 
         // fence.setCollisionByProperty({ collides: true });
-        ground.setCollisionByProperty({ collides: true });
+        water.setCollisionByProperty({ collides: true });
+        // this.matter.world.convertTilemapLayer(water)
 
-        // this.avatar.setCollideWorldBounds(true);
+        this.avatar.setCollideWorldBounds(true);
 
 
         this.trees = this.physics.add.group({
@@ -69,6 +71,10 @@ class Play extends Phaser.Scene {
             key: 'tree',
             quantity: 9
         });
+
+        if (this.collectables.quantity == 0){
+
+        } 
 
         this.collectables.children.each(function (collectable) {
             // let x = Phaser.Math.Between(400, this.sys.canvas.height);
@@ -113,25 +119,32 @@ class Play extends Phaser.Scene {
 
         {
             //  Implicit values
-            const config1 = {
-                text: 'hi im a tree',
-                style: {
-                    fontSize: '64px',
-                    fontFamily: 'Arial',
-                    color: '#ffffff',
-                    align: 'center',
-                    backgroundColor: '#ff00ff',
-                    shadow: {
-                        color: '#000000',
-                        fill: true,
-                        offsetX: 2,
-                        offsetY: 2,
-                        blur: 8
-                    }
+            const configStyle = {
+                fontSize: '64px',
+                fontFamily: 'Arial',
+                color: '#ffffff',
+                align: 'center',
+                backgroundColor: '#ff00ff',
+                shadow: {
+                    color: '#000000',
+                    fill: true,
+                    offsetX: 2,
+                    offsetY: 2,
+                    blur: 8
                 }
+            }
+
+            const treeTalking = {
+                text: 'hi im a tree' ,
+                style: configStyle
             };
 
-            this.dialogBox = this.make.text(config1);
+            const npc1Talk = {
+                text: 'hi im a person' ,
+                style: configStyle
+            };
+
+            this.dialogBox = this.make.text(treeTalking);
             this.dialogBox.setVisible(false);
         }
 
