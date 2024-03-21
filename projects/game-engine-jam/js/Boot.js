@@ -29,6 +29,7 @@ class Boot extends Phaser.Scene {
         this.load.image("fencesImage", "assets/images/tilesImages/Fences.png")
         this.load.image("bridgeImage", "assets/images/tilesImages/Wood_Bridge.png")
         this.load.image("miscImage", "assets/images/tilesImages/Basic_Grass_Biom_things.png")
+        this.load.image("ropeImage", "assets/images/tilesImages/Rope.png")
         this.load.tilemapTiledJSON("mapTest", "assets/images/mapTest.json")
 
 

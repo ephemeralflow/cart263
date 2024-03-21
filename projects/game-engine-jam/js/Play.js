@@ -20,29 +20,27 @@ class Play extends Phaser.Scene {
 
         let grassBase = map.addTilesetImage("Grass", "grassImage");
 
-        let fencesBase = map.addTilesetImage("Fences", "fencesImage");
         let bridgeBase = map.addTilesetImage("Wood_Bridge", "bridgeImage");
         // let miscBase = map.addTilesetImage("Misc", "miscImage");
 
         let ground = map.createLayer("ground", grassBase, 0, 0);
-        let fence = map.createLayer("highestlayer", fencesBase);
         let bridge = map.createLayer("bridge", bridgeBase, 0, 0);
-        // let toplayer = map.createLayer("highestlayer", miscBase, 0, 0);
-        // fence.setCollisionByExclusion([-1]);
-        // water.setCollisionByExclusion([-1]);
 
         this.avatar = this.physics.add.sprite(150, 100, `avatar`);
-        this.npc1 = this.physics.add.sprite(250, 105, "npc1").setImmovable(true);
+        this.avatar.setSize(16, 16, true)
 
-        this.npc1.setSize(10, 20, true)
-        this.avatar.setSize(16, 28, true)
-
+        let fencesBase = map.addTilesetImage("Fences", "fencesImage");
+        let fence = map.createLayer("fenceLayer", fencesBase);
+        fence.setCollisionByProperty({ collides: true });
         this.physics.add.collider(this.avatar, fence);
-        this.physics.add.collider(this.avatar, water);
 
-        // fence.setCollisionByProperty({ collides: true });
-        water.setCollisionByProperty({ collides: true });
-        // this.matter.world.convertTilemapLayer(water)
+        let ropeBase = map.addTilesetImage("Rope", "ropeImage");
+        let rope = map.createLayer("ropeLayer", ropeBase);
+        rope.setCollisionByProperty({ collides: true });
+        this.physics.add.collider(this.avatar, rope);
+
+        this.npc1 = this.physics.add.sprite(250, 105, "npc1").setImmovable(true);
+        this.npc1.setSize(10, 20, true)
 
         this.avatar.setCollideWorldBounds(true);
 
@@ -72,14 +70,7 @@ class Play extends Phaser.Scene {
             quantity: 9
         });
 
-        if (this.collectables.quantity == 0){
-
-        } 
-
         this.collectables.children.each(function (collectable) {
-            // let x = Phaser.Math.Between(400, this.sys.canvas.height);
-            // let y = Phaser.Math.Between(1100, this.sys.canvas.height);
-
             let x = Phaser.Math.Between(400, 600);
             let y = Phaser.Math.Between(700, 900);
             collectable.setPosition(x, y);
@@ -110,8 +101,8 @@ class Play extends Phaser.Scene {
 
         // this.physics.add.collider(this.avatar, this.trees);
         this.physics.add.collider(this.avatar, this.specialTree, this.changeScene, null, this);
-        this.physics.add.collider(this.avatar, this.dialogTest, this.dialogBoxFunction, null, this);
-        this.physics.add.collider(this.avatar, this.npc1);
+        this.physics.add.collider(this.avatar, this.dialogTest, this.displayTreeDialog, null, this);
+        this.physics.add.collider(this.avatar, this.npc1, this.displayNPCDialog, null, this);
 
 
 
@@ -135,17 +126,28 @@ class Play extends Phaser.Scene {
             }
 
             const treeTalking = {
-                text: 'hi im a tree' ,
+                text: 'hi im a tree',
                 style: configStyle
             };
 
             const npc1Talk = {
-                text: 'hi im a person' ,
+                text: 'hi im a person',
+                style: configStyle
+            };
+
+            const npc1Talk2 = {
+                text: 'yippee',
                 style: configStyle
             };
 
             this.dialogBox = this.make.text(treeTalking);
             this.dialogBox.setVisible(false);
+
+            this.dialogBoxNPC1 = this.make.text(npc1Talk);
+            this.dialogBoxNPC1.setVisible(false);
+
+            this.dialogBoxNPC2 = this.make.text(npc1Talk2);
+            this.dialogBoxNPC2.setVisible(false);
         }
 
         this.createAnimations();
@@ -178,26 +180,35 @@ class Play extends Phaser.Scene {
         // rt.mask.invertAlpha = true;
     }
 
-    /**
-        Called when the avatar overlaps the sadness, moves the sadness to a new random  position.
-        */
-    dialogBoxFunction(avatar, dialogTest) {
-        this.displaySadDialog();
-    }
-
     changeScene() {
+        //Change the scene to another state
         this.scene.start("play2");
     }
 
-    displaySadDialog() {
+    displayTreeDialog(avatar, dialogTest) {
         // Display the dialog
         this.dialogBox.setVisible(true);
         this.dialogBox.setPosition(100, 400);
         this.physics.pause();
     }
 
-    hideSadDialog() {
+    displayNPCDialog(avatar, npc1) {
+        if (this.collectables.quantity >= 1 && this.collectables.quantity <= 9) {
+
+        }
+
+        this.dialogBoxNPC1.setVisible(true);
+        this.dialogBoxNPC1.setPosition(100, 400);
+        this.physics.pause();
+
+        if (this.collectables.quantity == 0) {
+
+        }
+    }
+
+    hideDialog() {
         this.dialogBox.setVisible(false);
+        this.dialogBoxNPC1.setVisible(false);
         this.physics.resume();
     }
 
@@ -219,7 +230,7 @@ class Play extends Phaser.Scene {
     handleInput() {
 
         if (this.cursors.space.isDown) {
-            this.hideSadDialog();
+            this.hideDialog();
         }
 
         // NOTE: We can now check which keys are pressed and set the velocity of our
