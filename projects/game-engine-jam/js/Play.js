@@ -27,7 +27,7 @@ class Play extends Phaser.Scene {
         let bridge = map.createLayer("bridge", bridgeBase, 0, 0);
 
         this.avatar = this.physics.add.sprite(150, 100, `avatar`);
-        this.avatar.setSize(16, 16, true)
+        this.avatar.setSize(16, 28, true)
 
         let fencesBase = map.addTilesetImage("Fences", "fencesImage");
         let fence = map.createLayer("fenceLayer", fencesBase);
@@ -201,14 +201,19 @@ class Play extends Phaser.Scene {
         this.dialogBoxNPC1.setPosition(100, 400);
         this.physics.pause();
 
-        if (this.collectables.quantity == 0) {
 
+
+        if (this.collectables.quantity == 0) {
+            this.dialogBoxNPC2.setVisible(true);
+            this.dialogBoxNPC2.setPosition(100, 400);
+            this.physics.pause();
         }
     }
 
     hideDialog() {
         this.dialogBox.setVisible(false);
         this.dialogBoxNPC1.setVisible(false);
+        this.dialogBoxNPC2.setVisible(false);
         this.physics.resume();
     }
 
