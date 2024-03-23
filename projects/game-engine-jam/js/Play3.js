@@ -1,7 +1,7 @@
-class Play extends Phaser.Scene {
+class Play3 extends Phaser.Scene {
     constructor() {
         super({
-            key: "play"
+            key: "play3"
         })
     }
 
@@ -48,21 +48,17 @@ class Play extends Phaser.Scene {
         //Loads the second NPC image and the collision box as well as making it immovable
         this.npc2 = this.physics.add.sprite(400, 700, "npc2").setImmovable(true);
         this.npc2.setSize(10, 20, true)
-
-        // COLLECTABLES
-        this.collectables = this.physics.add.group({
-            key: 'tree',
-            quantity: 9
+        //Invisible block that serves as a checker that you talked with the NPC at the bottom
+        this.invisibleTrigger1 = this.physics.add.group({
+            key: 'invisibleTrigger',
+            quantity: 1,
+            immovable: true,
         });
-
-        this.collectables.children.each(function (collectable) {
-            let x = Phaser.Math.Between(400, 600);
-            let y = Phaser.Math.Between(700, 900);
-            collectable.setPosition(x, y);
-            collectable.setTint(`0x3333dd`);
+        this.invisibleTrigger1.children.each(function (invisibleTriggerS1) {
+            invisibleTriggerS1.setPosition(400, 700);
         }, this);
 
-        //Loads the Talking Tree
+
         this.talkingTree = this.physics.add.group({
             key: 'tree',
             quantity: 1,
@@ -74,16 +70,13 @@ class Play extends Phaser.Scene {
             talkingTreeA.setTint(`0x3333dd`);
         }, this);
 
-        //Adds the colliders between the avatar and different objects
         this.physics.add.collider(this.avatar, this.talkingTree, this.displayTreeDialog, null, this);
-        //If the avatar collides with the NPC it will call for the function of displaying the NPC dialog
         this.physics.add.collider(this.avatar, this.npc1, this.displayNPC1Dialog, null, this);
         this.physics.add.collider(this.avatar, this.npc2, this.displayNPC2Dialog, null, this);
-        //If the avatar collides with the collectable plants, it will call for the collectItem function
-        this.physics.add.overlap(this.avatar, this.collectables, this.collectItem, null, this);
+        this.physics.add.collider(this.avatar, this.invisibleTrigger1, this.activateEndingBlock, null, this);
 
         {
-            //  Sets the appearance of the text shown
+            //  Implicit values
             const configStyle = {
                 fontSize: '64px',
                 fontFamily: 'Arial',
@@ -99,29 +92,18 @@ class Play extends Phaser.Scene {
                 }
             }
 
-            //Sets the text of everything that speaks
             const treeTalking = {
-                text: 'hi im a tree',
+                text: 't̸̢̠̘̻̤̭̥̳̗̪̘͓̝̍̀͗͌̽́̑͂̎̏́͒̚r̵̢̨̭̰̝̻͓͚̲̭͋͑̆̔̐̋̒̅̕e̴͔̥͍̙̼̼͓̻̤̊̾͌e̶̢͓͈̲͇̥̜͓̝̜̾̊̀̆̈͒̽̈́͑͘',
                 style: configStyle
             };
 
             const npc1Talk = {
-                text: 'Hello!!! Can you collect\n some plants for me?',
-                style: configStyle
-            };
-
-            const npc1Talk2 = {
-                text: 'Thank you!!!',
+                text: 'Can you \nhelp my friend?',
                 style: configStyle
             };
 
             const npc2Talk = {
-                text: '...',
-                style: configStyle
-            };
-
-            const npc2Talk2 = {
-                text: 'I lost something.',
+                text: 'Oh thank you I wonder\n where it was',
                 style: configStyle
             };
 
@@ -132,20 +114,10 @@ class Play extends Phaser.Scene {
             this.dialogBoxNPC1A = this.make.text(npc1Talk);
             this.dialogBoxNPC1A.setVisible(false);
 
-            this.dialogBoxNPC2A = this.make.text(npc1Talk2);
-            this.dialogBoxNPC2A.setVisible(false);
-
             this.dialogBoxNPC1B = this.make.text(npc2Talk);
             this.dialogBoxNPC1B.setVisible(false);
-
-            this.dialogBoxNPC2B = this.make.text(npc2Talk2);
-            this.dialogBoxNPC2B.setVisible(false);
         }
-
-        //calls the animation function
-        this.createAnimations();
-
-        //Makes the default animations the idle ones for each character on the screen
+        //Play idle animations
         this.avatar.play(`idle`);
         this.npc1.play("npcIdle1", true)
         this.npc2.play("npcIdle2", true)
@@ -157,60 +129,51 @@ class Play extends Phaser.Scene {
         this.cameras.main.startFollow(this.avatar, true, 0.05, 0.05);
     }
 
+    //invisible trigger for when you walk towards the second NPC, a block in your way will appear to then call for a change of scenes
+    activateEndingBlock(avatar, item) {
+        item.destroy();
+        this.invisibleTrigger2 = this.physics.add.sprite(510, 550, `invisibleTrigger`).setImmovable(true);
+        if (this.invisibleTrigger1.countActive() == 0) {
+            this.physics.add.collider(this.avatar, this.invisibleTrigger2, this.changeScene, null, this);
+        }
+    }
+
     changeScene() {
         //Change the scene to another state
-        this.scene.start("play2");
+        if (this.invisibleTrigger1.countActive() == 0) {
+            this.scene.start("ending");
+        }
     }
 
     displayTreeDialog(avatar, talkingTree) {
-        // Display the dialog as well as pausing the physics so you can't move
+        // Display the dialog for the tree
         this.dialogBox.setVisible(true);
         this.dialogBox.setPosition(100, 400);
         this.physics.pause();
     }
 
+    //Display the NPC dialog
     displayNPC1Dialog(avatar, npc1) {
-        //Displaying the dialog for the first NPC depending on how many collectables are still on screen
-        if (this.collectables.countActive() >= 1 && this.collectables.countActive() <= 9) {
-            this.dialogBoxNPC1A.setVisible(true);
-            this.dialogBoxNPC1A.setPosition(100, 400);
-            this.physics.pause();
-        } else {
-            this.invisibleTrigger = this.physics.add.sprite(250, 130, `invisibleTrigger`).setImmovable(true);
-            this.physics.add.collider(this.avatar, this.invisibleTrigger, this.changeScene, null, this);
-        }
+        this.dialogBoxNPC1A.setVisible(true);
+        this.dialogBoxNPC1A.setPosition(100, 400);
+        this.physics.pause();
     }
 
     displayNPC2Dialog(avatar, npc2) {
-        //Displaying the dialog for the second NPC depending on how many collectables are still on screen
-        if (this.collectables.countActive() >= 1 && this.collectables.countActive() <= 9) {
-            this.dialogBoxNPC1B.setVisible(true);
-            this.dialogBoxNPC1B.setPosition(100, 800);
-            this.physics.pause();
-        } else {
-            this.dialogBoxNPC2B.setVisible(true);
-            this.dialogBoxNPC2B.setPosition(100, 800);
-            this.physics.pause();
-        }
+        this.dialogBoxNPC1B.setVisible(true);
+        this.dialogBoxNPC1B.setPosition(100, 800);
+        this.physics.pause();
     }
 
-    //Hides the dialog as well as resumes the physics so you can move again
+    //Function to resume the physics and hide the dialog
     hideDialog() {
         this.dialogBox.setVisible(false);
         this.dialogBoxNPC1A.setVisible(false);
-        this.dialogBoxNPC2A.setVisible(false);
         this.dialogBoxNPC1B.setVisible(false);
-        this.dialogBoxNPC2B.setVisible(false);
         this.physics.resume();
     }
 
-    collectItem(avatar, item) {
-        //Destroys the collectables
-        item.destroy();
-    }
-
     update() {
-        //Handles the input as in makes it that the camera will move with the avatar
         this.handleInput();
         if (this.vision) {
             this.vision.x = this.avatar.x;
@@ -259,75 +222,5 @@ class Play extends Phaser.Scene {
         else {
             this.avatar.play(`idle`, true);
         }
-    }
-
-    //Create the animations for the characters (such as idle and walking for the main avatar)
-    createAnimations() {
-        let idleAvatar = {
-            key: `idle`,
-            frames: this.anims.generateFrameNumbers(`avatar`, {
-                start: 27,
-                end: 28
-            }),
-            frameRate: 2,
-            repeat: -1
-        };
-        this.anims.create(idleAvatar);
-
-        let npcIdle1 = {
-            key: "npcIdle1",
-            frames: this.anims.generateFrameNumbers("npc1", { frames: [0, 1] }),
-            frameRate: 2,
-            repeat: -1
-        };
-        this.anims.create(npcIdle1);
-
-        let npcIdle2 = {
-            key: "npcIdle2",
-            frames: this.anims.generateFrameNumbers("npc2", { frames: [0, 1] }),
-            frameRate: 2,
-            repeat: -1
-        };
-        this.anims.create(npcIdle2);
-
-        let forwardAvatar = {
-            key: `avatarWalkForward`,
-            frames: this.anims.generateFrameNumbers(`avatar`, {
-                start: 0,
-                end: 8
-            }),
-            frameRate: 24,
-            repeat: -1
-        };
-        this.anims.create(forwardAvatar);
-
-        this.anims.create({
-            key: "avatarWalkBack",
-            frames: this.anims.generateFrameNumbers("avatar", { frames: [22, 23, 24, 25, 26] }),
-            frameRate: 24,
-            repeat: -1
-        })
-
-        let rightSideAvatar = {
-            key: `avatarWalkSideRight`,
-            frames: this.anims.generateFrameNumbers(`avatar`, {
-                start: 9,
-                end: 15
-            }),
-            frameRate: 16,
-            repeat: -1
-        };
-        this.anims.create(rightSideAvatar);
-
-        let leftSideAvatar = {
-            key: `avatarWalkSideLeft`,
-            frames: this.anims.generateFrameNumbers(`avatar`, {
-                start: 16,
-                end: 21
-            }),
-            frameRate: 16,
-            repeat: -1
-        };
-        this.anims.create(leftSideAvatar);
     }
 }

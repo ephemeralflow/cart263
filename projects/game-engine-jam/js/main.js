@@ -1,9 +1,8 @@
 /**
-Title of Project
-Author Name
+I actually don't know what to call this game
+Scarlett Perez
 
-This is a template. You must fill in the title,
-author, and this description to match your project!
+A silly game where you help some random person with stuff because you have no life and also no way out and stuff.
 */
 
 "use strict";
@@ -13,9 +12,11 @@ let config = {
     width: 800,
     height: 600,
     physics: {
-        default: "arcade"
+        default: "arcade",
+        arcade: {
+        }
     },
-    scene: [Boot, Play, Play2]
+    scene: [Boot, Menu, Play, Play2, Play3, Ending]
 }
 
 let game = new Phaser.Game(config)

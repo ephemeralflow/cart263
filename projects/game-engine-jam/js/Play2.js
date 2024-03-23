@@ -5,12 +5,11 @@ class Play2 extends Phaser.Scene {
         })
     }
 
-    text;
-
     create() {
         this.cameras.main.setBounds(0, 0, 500 * 2, 500 * 2);
         this.physics.world.setBounds(0, 0, 500 * 2, 500 * 2);
 
+        //Makes the tree objects that will be put randomly around the world
         this.trees = this.physics.add.group({
 
             key: `tree`,
@@ -19,136 +18,126 @@ class Play2 extends Phaser.Scene {
 
             quantity: 455,
         });
-        //this.scene.start("NAME OF SCENE");
 
-        this.npc2 = this.physics.add.sprite(350, 105, "npc2");
-
-
-        //TREES
+        //Random location + A tint to red to make them look kinda weird
         this.trees.children.each(function (tree) {
             let x = Phaser.Math.Between(0, 3840);
             let y = Phaser.Math.Between(0, 2160);
-            // Set the position of the current wall
             tree.setPosition(x, y);
-            // Set the tint of the current wall
             tree.setTint(`0xdd3333`);
         }, this);
 
-        this.specialTree = this.physics.add.group({
-            key: 'tree',
+        //Invisible block that literally only serves the purpose so that .countActive can be used for grabbing the star as countActive only works with this for some reason
+        this.invisibleTrigger = this.physics.add.group({
+            key: 'invisibleTrigger',
             quantity: 1,
             immovable: true,
         });
 
-        this.specialTree.children.each(function (specialTreeS) {
-            specialTreeS.setPosition(100, 100);
-            specialTreeS.setTint(`0xdd3333`);
+        this.invisibleTrigger.children.each(function (invisibleTriggerS) {
+            invisibleTriggerS.setPosition(400, 105);
         }, this);
 
-        this.dialogTest = this.physics.add.group({
-            key: 'tree',
-            quantity: 1,
-            // immovable: true,
-        });
-
-        this.dialogTest.children.each(function (dialogTestS) {
-            dialogTestS.setPosition(200, 100);
-            dialogTestS.setTint(`0x3333dd`);
-        }, this);
-
-        // Create a sadness emoji in a random position
-        this.sadness = this.physics.add.sprite(0, 0, `tree`);
-        this.sadness.setTint(0xff0000);
-        // Note how we can use RandomRectangle() here if we put the object we want
-        // to reposition randomly in an array!
-        Phaser.Actions.RandomRectangle([this.sadness], this.physics.world.bounds);
-
-
+        //Loads the sprites of the NPC as well as the door and the star
+        this.npc3 = this.physics.add.sprite(350, 105, "npc3");
+        this.door = this.physics.add.sprite(100, 105, "door").setImmovable(true);
+        this.star = this.physics.add.sprite(400, 105, "star");
         this.avatar = this.physics.add.sprite(200, 200, `avatar`);
 
+        //Loads the colliders for the trees as well as the checkers and the door to call different functions
         this.physics.add.collider(this.avatar, this.trees);
-        this.physics.add.collider(this.avatar, this.specialTree);
-        this.physics.add.collider(this.avatar, this.dialogTest, this.dialogBoxFunction, null, this);
+        this.physics.add.collider(this.avatar, this.door, this.changeScene, null, this);
+        this.physics.add.collider(this.avatar, this.invisibleTrigger, this.collectStar, null, this);
 
-        this.physics.add.overlap(this.avatar, this.collectables, this.collectItem, null, this);
 
         {
-            //  Implicit values
-            const config1 = {
-                x: 100,
-                y: 100,
-                text: 'Why are you here',
-                style: {
-                    fontSize: '64px',
-                    fontFamily: 'Arial',
-                    color: '#ffffff',
-                    align: 'center',
-                    backgroundColor: '#ff00ff',
-                    shadow: {
-                        color: '#000000',
-                        fill: true,
-                        offsetX: 2,
-                        offsetY: 2,
-                        blur: 8
-                    }
+            //  Sets the appearance of the text shown
+            const configStyle = {
+                fontSize: '50px',
+                fontFamily: 'Arial',
+                color: '#ffffff',
+                align: 'center',
+                backgroundColor: '#ff00ff',
+                shadow: {
+                    color: '#000000',
+                    fill: true,
+                    offsetX: 2,
+                    offsetY: 2,
+                    blur: 8
                 }
+            }
+
+            //Makes the dialog for the NPC
+            const npc3Talk = {
+                text: 'Hello! Why are you here? Oh\nyou lost something? Right next to\nme is what you seek or whatever.',
+                style: configStyle
             };
 
-            this.dialogBox = this.make.text(config1);
-            this.dialogBox.setVisible(false);
+            //sets the dialog box as well as the text goes in 
+            this.npc3Talk = this.make.text(npc3Talk);
+            this.npc3Talk.setVisible(false);
         }
 
+        //Calls the animation function as well as makes the default animations the idle ones for each character on the screen
         this.createAnimations();
-        this.npc2.play("idleNPC2", true)
+        this.npc3.play("idleNPC3", true)
+        this.star.play("starAnim", true)
         this.avatar.play(`idle`);
 
+        //Colliders between the avatar and the NPC as to activate the dialog
+        this.physics.add.collider(this.avatar, this.npc3, this.displayNPC3Dialog, null, this);
+        //Colliders between the avatar and the star as to collect said star
+        this.physics.add.collider(this.avatar, this.star, this.starCollect, null, this);
+
+        //Creates the cursors
         this.cursors = this.input.keyboard.createCursorKeys();
 
+        //Code for the camera to follow the avatar
         this.cameras.main.startFollow(this.avatar, true, 0.05, 0.05);
     }
 
-    /**
-        Called when the avatar overlaps the sadness, moves the sadness to a new random  position.
-        */
-    dialogBoxFunction(avatar, dialogTest) {
-        // Note how we can use RandomRectangle() again here if we put the object we want
-        // to reposition randomly in an array!
-        Phaser.Actions.RandomRectangle([dialogTest], this.physics.world.bounds);
-
-        this.displaySadDialog();
+    //Hides the star the moment the avatar and the star overlap
+    starCollect(avatar, star) {
+        this.star.setVisible(false)
+    }
+    //function for when you overlap with the star (which has an extra checker) it will get destroyed
+    collectStar(avatar, item) {
+        item.destroy();
     }
 
-    displaySadDialog() {
-        // Display the dialog
-        this.dialogBox.setVisible(true);
+    displayNPC3Dialog(avatar, npc3) {
+        // Display the dialog as well as stops physics
+        this.npc3Talk.setVisible(true);
+        this.npc3Talk.setPosition(25, 400);
         this.physics.pause();
     }
 
-    hideSadDialog() {
-        this.dialogBox.setVisible(false);
+    //Hides the dialog as well as resumes the physics so you can move again
+    hideDialog() {
+        this.npc3Talk.setVisible(false);
         this.physics.resume();
     }
 
-    collectItem(avatar, item) {
-        // NOTE: We'll keep it simple by just removing the collectable from the scene
-        // using its .destroy() method!
-        // item.destroy();
-    }
-
+    //calls the input function
     update() {
         this.handleInput();
     }
 
+    changeScene() {
+        //Change the scene to another state
+        if (this.invisibleTrigger.countActive() == 0) {
+            this.scene.start("play3");
+        }
+    }
+
 
     handleInput() {
-
+        //When SPACE is pressed, call the hideDialog function
         if (this.cursors.space.isDown) {
-            this.hideSadDialog();
+            this.hideDialog();
         }
 
-        // NOTE: We can now check which keys are pressed and set the velocity of our
-        // avatar sprite accordingly.
-        // EXAMPLE: https://phaser.io/examples/v3/view/input/keyboard/cursor-keys
+        //When any key (UP, DOWN, LEFT, RIGHT) is pressed, go in the direction that it calls, also play the animation of said direction
         if (this.cursors.left.isDown) {
             this.avatar.setVelocityX(-100);
             this.avatar.play('avatarWalkSideLeft', true);
@@ -178,23 +167,25 @@ class Play2 extends Phaser.Scene {
 
         if (this.avatar.body.velocity.x !== 0 || this.avatar.body.velocity.y !== 0) {
         }
-        // Otherwise it's not moving
+        // Otherwise it's not moving so play the idle animation
         else {
             this.avatar.play(`idle`, true);
         }
     }
 
-
-
+    //Create the animations for the characters (such as idle and walking for the main avatar)
     createAnimations() {
         this.anims.create({
-            key: "idleNPC2",
-            frames: this.anims.generateFrameNumbers("npc2", { frames: [0, 1, 2, 3] }),
+            key: "idleNPC3",
+            frames: this.anims.generateFrameNumbers("npc3", { frames: [0, 1, 2, 3] }),
             frameRate: 2,
+            repeat: -1
+        })
+        this.anims.create({
+            key: "starAnim",
+            frames: this.anims.generateFrameNumbers("star", { frames: [0, 1, 2, 3, 4, 5, 6, 7, 8] }),
+            frameRate: 12,
             repeat: -1
         })
     }
 }
-
-// undefined, this.(state).this
-//https://blog.ourcade.co/posts/2020/phaser3-fog-of-war-field-of-view-roguelike/
