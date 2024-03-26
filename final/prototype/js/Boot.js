@@ -42,6 +42,13 @@ class Boot extends Phaser.Scene {
             endFrame: 8,
         })
 
+        //load
+        this.load.image("testIcon", "assets/images/testIcon.png")
+        this.load.image("testBox", "assets/images/testBox.png")
+        this.load.image("treeIcon", "assets/images/treeIcon.png")
+        this.load.image("npc1Icon", "assets/images/npc1Icon.png")
+        this.load.image("npc2Icon", "assets/images/npc2Icon.png")
+
         //Loading MAP images
         this.load.image("tree", "assets/images/Tree.png")
         this.load.image("door", "assets/images/door.png")
@@ -57,7 +64,7 @@ class Boot extends Phaser.Scene {
 
 
         this.load.on("complete", () => {
-            this.scene.start("menu");
+            this.scene.start("play");
         })
     }
 

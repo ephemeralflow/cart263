@@ -82,14 +82,16 @@ class Play extends Phaser.Scene {
         //If the avatar collides with the collectable plants, it will call for the collectItem function
         this.physics.add.overlap(this.avatar, this.collectables, this.collectItem, null, this);
 
+        this.displayDialogBoxes()
+
         {
             //  Sets the appearance of the text shown
             const configStyle = {
-                fontSize: '64px',
+                fontSize: '48px',
                 fontFamily: 'Arial',
                 color: '#ffffff',
                 align: 'center',
-                backgroundColor: '#ff00ff',
+                // backgroundColor: '#ff00ff',
                 shadow: {
                     color: '#000000',
                     fill: true,
@@ -157,6 +159,17 @@ class Play extends Phaser.Scene {
         this.cameras.main.startFollow(this.avatar, true, 0.05, 0.05);
     }
 
+    displayDialogBoxes() {
+        this.testBox = this.add.image(40, 390, "testBox").setOrigin(0)
+        this.testBox.setVisible(false);
+        this.treeIcon = this.add.image(50, 400, "treeIcon").setOrigin(0)
+        this.treeIcon.setVisible(false);
+        this.npc1Icon = this.add.image(50, 400, "npc1Icon").setOrigin(0)
+        this.npc1Icon.setVisible(false);
+        this.npc2Icon = this.add.image(50, 400, "npc2Icon").setOrigin(0)
+        this.npc2Icon.setVisible(false);
+    }
+
     changeScene() {
         //Change the scene to another state
         this.scene.start("play2");
@@ -164,16 +177,20 @@ class Play extends Phaser.Scene {
 
     displayTreeDialog(avatar, talkingTree) {
         // Display the dialog as well as pausing the physics so you can't move
+        this.testBox.setVisible(true);
+        this.treeIcon.setVisible(true);
         this.dialogBox.setVisible(true);
-        this.dialogBox.setPosition(100, 400);
+        this.dialogBox.setPosition(200, 400);
         this.physics.pause();
     }
 
     displayNPC1Dialog(avatar, npc1) {
         //Displaying the dialog for the first NPC depending on how many collectables are still on screen
         if (this.collectables.countActive() >= 1 && this.collectables.countActive() <= 9) {
+            this.testBox.setVisible(true);
+            this.npc1Icon.setVisible(true);
             this.dialogBoxNPC1A.setVisible(true);
-            this.dialogBoxNPC1A.setPosition(100, 400);
+            this.dialogBoxNPC1A.setPosition(200, 400);
             this.physics.pause();
         } else {
             this.invisibleTrigger = this.physics.add.sprite(250, 130, `invisibleTrigger`).setImmovable(true);
@@ -201,6 +218,9 @@ class Play extends Phaser.Scene {
         this.dialogBoxNPC2A.setVisible(false);
         this.dialogBoxNPC1B.setVisible(false);
         this.dialogBoxNPC2B.setVisible(false);
+        this.testBox.setVisible(false);
+        this.treeIcon.setVisible(false);
+        this.npc1Icon.setVisible(false);
         this.physics.resume();
     }
 
