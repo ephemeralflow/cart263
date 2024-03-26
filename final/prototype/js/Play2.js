@@ -85,7 +85,7 @@ class Play2 extends Phaser.Scene {
         this.avatar.play(`idle`);
 
         //Colliders between the avatar and the NPC as to activate the dialog
-        this.physics.add.collider(this.avatar, this.npc3, this.displayNPC3Dialog, null, this);
+        // this.physics.add.collider(this.avatar, this.npc3, this.displayNPC3Dialog, null, this);
         //Colliders between the avatar and the star as to collect said star
         this.physics.add.collider(this.avatar, this.star, this.starCollect, null, this);
 
@@ -121,6 +121,7 @@ class Play2 extends Phaser.Scene {
     //calls the input function
     update() {
         this.handleInput();
+        this.physics.moveToObject(this.npc3,this.avatar,100)
     }
 
     changeScene() {

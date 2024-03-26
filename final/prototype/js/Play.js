@@ -87,7 +87,7 @@ class Play extends Phaser.Scene {
         {
             //  Sets the appearance of the text shown
             const configStyle = {
-                fontSize: '48px',
+                fontSize: '28px',
                 fontFamily: 'Arial',
                 color: '#ffffff',
                 align: 'center',
@@ -157,12 +157,15 @@ class Play extends Phaser.Scene {
 
         //Code for the camera to follow the avatar
         this.cameras.main.startFollow(this.avatar, true, 0.05, 0.05);
+        this.cameras.main.setZoom(2)
     }
 
     displayDialogBoxes() {
-        this.testBox = this.add.image(40, 390, "testBox").setOrigin(0)
+        this.testBox = this.add.image(40, 200, "testBox").setOrigin(0)
         this.testBox.setVisible(false);
-        this.treeIcon = this.add.image(50, 400, "treeIcon").setOrigin(0)
+        this.testBox1 = this.add.image(90, 200, "testBox").setOrigin(0)
+        this.testBox1.setVisible(false);
+        this.treeIcon = this.add.image(45, 205, "treeIcon").setOrigin(0)
         this.treeIcon.setVisible(false);
         this.npc1Icon = this.add.image(50, 400, "npc1Icon").setOrigin(0)
         this.npc1Icon.setVisible(false);
@@ -180,14 +183,14 @@ class Play extends Phaser.Scene {
         this.testBox.setVisible(true);
         this.treeIcon.setVisible(true);
         this.dialogBox.setVisible(true);
-        this.dialogBox.setPosition(200, 400);
+        this.dialogBox.setPosition(110, 200);
         this.physics.pause();
     }
 
     displayNPC1Dialog(avatar, npc1) {
         //Displaying the dialog for the first NPC depending on how many collectables are still on screen
         if (this.collectables.countActive() >= 1 && this.collectables.countActive() <= 9) {
-            this.testBox.setVisible(true);
+            this.testBox1.setVisible(true);
             this.npc1Icon.setVisible(true);
             this.dialogBoxNPC1A.setVisible(true);
             this.dialogBoxNPC1A.setPosition(200, 400);
@@ -219,6 +222,7 @@ class Play extends Phaser.Scene {
         this.dialogBoxNPC1B.setVisible(false);
         this.dialogBoxNPC2B.setVisible(false);
         this.testBox.setVisible(false);
+        this.testBox1.setVisible(false);
         this.treeIcon.setVisible(false);
         this.npc1Icon.setVisible(false);
         this.physics.resume();

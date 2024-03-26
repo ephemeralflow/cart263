@@ -16,7 +16,8 @@ let config = {
         arcade: {
         }
     },
-    scene: [Boot, Menu, Play, Play2, Play3, Ending]
+    scene: [Boot, Menu, Play, Play2, Play3, Ending],
+    antialias: false,
 }
 
 let game = new Phaser.Game(config)
