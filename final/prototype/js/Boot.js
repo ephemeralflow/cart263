@@ -88,7 +88,7 @@ class Boot extends Phaser.Scene {
 
 
         this.load.on("complete", () => {
-            this.scene.start("play");
+            this.scene.start("menu");
         })
     }
 
