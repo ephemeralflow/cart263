@@ -9,6 +9,7 @@ class Play extends Phaser.Scene {
         //Sets the camera of the scene + the physics so it will move
         this.cameras.main.setBounds(0, 0, 480 * 2, 480 * 2);
         this.physics.world.setBounds(0, 0, 480 * 2, 480 * 2);
+        this.cameras.main.fadeIn(1000, 0, 0, 0)
 
         //Loading map tiles + layers
         let map = this.make.tilemap({ key: "mapTest" })
@@ -19,6 +20,9 @@ class Play extends Phaser.Scene {
         let grassBase = map.addTilesetImage("Grass", "grassImage");
         let ground = map.createLayer("ground", grassBase, 0, 0);
 
+        let dirtBase = map.addTilesetImage("Tilled_Dirt", "dirtImage");
+        let dirt = map.createLayer("dirt", dirtBase, 0, 0);
+
         let bridgeBase = map.addTilesetImage("Wood_Bridge", "bridgeImage");
         let bridge = map.createLayer("bridge", bridgeBase, 0, 0);
 
@@ -28,6 +32,8 @@ class Play extends Phaser.Scene {
         //Loading Avatar
         this.avatar = this.physics.add.sprite(150, 100, `avatar`);
         this.avatar.setSize(16, 20, true)
+
+        this.bridgeInteractionTrigger =  this.physics.add.sprite(120, 250, `invisibleTrigger`);
 
         //Loads the fence layer + adds collisions between the avatar and fence
         let fencesBase = map.addTilesetImage("Fences", "fencesImage");
@@ -48,6 +54,14 @@ class Play extends Phaser.Scene {
         //Loads the second NPC image and the collision box as well as making it immovable
         this.npc2 = this.physics.add.sprite(400, 700, "npc2").setImmovable(true);
         this.npc2.setSize(10, 20, true)
+        
+        //Loads the fifth NPC image and the collision box as well as making it immovable
+        this.npc5 = this.physics.add.sprite(700, 70, "npc5").setImmovable(true);
+        this.npc5.setSize(10, 20, true)
+
+        this.sign = this.physics.add.sprite(470, 105, "sign").setImmovable(true);
+        this.sign.setSize(20, 20, true)
+        this.door = this.physics.add.sprite(510, 80, "door").setImmovable(true);
 
         // COLLECTABLES
         this.collectables = this.physics.add.group({
@@ -74,13 +88,40 @@ class Play extends Phaser.Scene {
             talkingTreeA.setTint(`0x3333dd`);
         }, this);
 
+        //Invisible block that literally only serves the purpose so that .countActive can be used for grabbing the star as countActive only works with this for some reason
+        this.gateTrigger = this.physics.add.group({
+            key: 'invisibleTrigger',
+            quantity: 1,
+            immovable: true,
+        });
+
+        this.gateTrigger.children.each(function (gateTriggerS) {
+            gateTriggerS.setPosition(700, 60);
+        }, this);
+
+
         //Adds the colliders between the avatar and different objects
         this.physics.add.collider(this.avatar, this.talkingTree, this.displayTreeDialog, null, this);
         //If the avatar collides with the NPC it will call for the function of displaying the NPC dialog
         this.physics.add.collider(this.avatar, this.npc1, this.displayNPC1Dialog, null, this);
         this.physics.add.collider(this.avatar, this.npc2, this.displayNPC2Dialog, null, this);
+        this.physics.add.collider(this.avatar, this.npc5, this.displayNPC5Dialog, null, this);
         //If the avatar collides with the collectable plants, it will call for the collectItem function
         this.physics.add.overlap(this.avatar, this.collectables, this.collectItem, null, this);
+        this.physics.add.collider(this.avatar, this.door, this.insideHouse, null, this);
+
+        this.physics.add.overlap(this.avatar, this.bridgeInteractionTrigger, this.displayBridgeDialog, null, this);
+
+        this.physics.add.collider(this.avatar, this.sign, this.displaySignDialog, null, this);
+        this.physics.add.collider(this.avatar, this.door, this.insideHouse, null, this);
+
+        this.physics.add.overlap(this.avatar, this.gateTrigger, this.gateTriggerFarmer, null, this);
+
+        //this is supposed to when you talk to the farmer (orange) that the gate will disappear but RIGHT NOW its not doing that so I changed the number so the gate wouldnt be there for testing purposes
+        if (this.gateTrigger.countActive() == 2 ) {
+            this.gate = this.physics.add.sprite(512, 165, `gate`).setImmovable(true);
+            this.physics.add.collider(this.avatar, this.gate, this.displayGateDialog, null, this);
+        }
 
         this.displayDialogBoxes()
 
@@ -107,8 +148,28 @@ class Play extends Phaser.Scene {
                 style: configStyle
             };
 
+            const bridgeInteraction = {
+                text: 'It seems the bridge \nis broken.',
+                style: configStyle
+            };
+
+            const signText = {
+                text: '... house.',
+                style: configStyle
+            };
+
+            const gateText = {
+                text: "It's locked.",
+                style: configStyle
+            };
+
+            const scene1Text = {
+                text: "What's happening!?",
+                style: configStyle
+            };
+
             const npc1Talk = {
-                text: 'Hello!!! Can you collect\n some plants for me?',
+                text: 'Hello!!!',
                 style: configStyle
             };
 
@@ -127,9 +188,26 @@ class Play extends Phaser.Scene {
                 style: configStyle
             };
 
+            const npc5Talk = {
+                text: "The gate's locked? \nI'll fix that",
+                style: configStyle
+            };
+
             //sets the dialog box as well as the text goes in 
+            this.bridgeInteractionBox = this.make.text(bridgeInteraction);
+            this.bridgeInteractionBox.setVisible(false);
+
             this.dialogBox = this.make.text(treeTalking);
             this.dialogBox.setVisible(false);
+            
+            this.dialogBoxSign = this.make.text(signText);
+            this.dialogBoxSign.setVisible(false);
+
+            this.dialogBoxGate = this.make.text(gateText);
+            this.dialogBoxGate.setVisible(false);
+
+            this.dialogBoxScene = this.make.text(scene1Text);
+            this.dialogBoxScene.setVisible(false);
 
             this.dialogBoxNPC1A = this.make.text(npc1Talk);
             this.dialogBoxNPC1A.setVisible(false);
@@ -142,6 +220,9 @@ class Play extends Phaser.Scene {
 
             this.dialogBoxNPC2B = this.make.text(npc2Talk2);
             this.dialogBoxNPC2B.setVisible(false);
+
+            this.dialogBoxNPC5 = this.make.text(npc5Talk);
+            this.dialogBoxNPC5.setVisible(false);
         }
 
         //calls the animation function
@@ -151,26 +232,29 @@ class Play extends Phaser.Scene {
         this.avatar.play(`idle`);
         this.npc1.play("npcIdle1", true)
         this.npc2.play("npcIdle2", true)
+        this.npc5.play("npcIdle5", true)
 
         //Creates the cursors
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        //Code for the camera to follow the avatar
+        //Code for the camera to follow the avatar and also to be closer
         this.cameras.main.startFollow(this.avatar, true, 0.05, 0.05);
         this.cameras.main.setZoom(2)
     }
 
     displayDialogBoxes() {
-        this.testBox = this.add.image(40, 200, "testBox").setOrigin(0)
+        this.testBox = this.add.image(0, 0, "testBox").setOrigin(0)
         this.testBox.setVisible(false);
-        this.testBox1 = this.add.image(90, 200, "testBox").setOrigin(0)
-        this.testBox1.setVisible(false);
         this.treeIcon = this.add.image(45, 205, "treeIcon").setOrigin(0)
         this.treeIcon.setVisible(false);
-        this.npc1Icon = this.add.image(50, 400, "npc1Icon").setOrigin(0)
+        this.avatarIcon = this.add.image(305, 205, "avatarIcon").setOrigin(0)
+        this.avatarIcon.setVisible(false);
+        this.npc1Icon = this.add.image(105, 205, "npc1Icon").setOrigin(0)
         this.npc1Icon.setVisible(false);
-        this.npc2Icon = this.add.image(50, 400, "npc2Icon").setOrigin(0)
-        this.npc2Icon.setVisible(false);
+        this.npc2Icon = this.add.image(265, 755, "npc2Icon").setOrigin(0)
+        this.npc2Icon.setVisible(false); 
+        this.npc5Icon = this.add.image(555, 205, "npc5Icon").setOrigin(0)
+        this.npc5Icon.setVisible(false); 
     }
 
     changeScene() {
@@ -178,22 +262,68 @@ class Play extends Phaser.Scene {
         this.scene.start("play2");
     }
 
+    insideHouse() {
+        //Change the scene to another state
+        this.cameras.main.fadeOut(1000, 0, 0, 0)
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+            this.scene.start('house')
+        })
+    }
+
+    gateTriggerFarmer(avatar, item){
+        item.destroy();
+    }
+
     displayTreeDialog(avatar, talkingTree) {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
+        this.testBox.setPosition(40, 200);
         this.treeIcon.setVisible(true);
         this.dialogBox.setVisible(true);
         this.dialogBox.setPosition(110, 200);
         this.physics.pause();
     }
 
+    displayGateDialog() {
+        // Display the dialog as well as pausing the physics so you can't move
+        this.testBox.setVisible(true);
+        this.testBox.setPosition(40, 300);
+        this.avatarIcon.setVisible(true);
+        this.dialogBoxGate.setVisible(true);
+        this.dialogBoxGate.setPosition(110, 200);
+        this.physics.pause();
+    }
+
+    displaySignDialog() {
+        // Display the dialog as well as pausing the physics so you can't move
+        this.testBox.setVisible(true);
+        this.testBox.setPosition(300, 200);
+        this.avatarIcon.setVisible(true);
+        this.avatarIcon.setPosition(305, 205);
+        this.dialogBoxSign.setVisible(true);
+        this.dialogBoxSign.setPosition(370, 200);
+        this.physics.pause();
+    }
+
+    displayBridgeDialog() {
+        // Display the dialog as well as pausing the physics so you can't move
+        this.testBox.setVisible(true);
+        this.testBox.setPosition(40, 270);
+        this.avatarIcon.setVisible(true);
+        this.avatarIcon.setPosition(45, 275);
+        this.bridgeInteractionBox.setVisible(true);
+        this.bridgeInteractionBox.setPosition(110, 270);
+        this.physics.pause();
+    }
+
     displayNPC1Dialog(avatar, npc1) {
         //Displaying the dialog for the first NPC depending on how many collectables are still on screen
         if (this.collectables.countActive() >= 1 && this.collectables.countActive() <= 9) {
-            this.testBox1.setVisible(true);
+            this.testBox.setVisible(true);
+            this.testBox.setPosition(100, 200);
             this.npc1Icon.setVisible(true);
             this.dialogBoxNPC1A.setVisible(true);
-            this.dialogBoxNPC1A.setPosition(200, 400);
+            this.dialogBoxNPC1A.setPosition(170, 200);
             this.physics.pause();
         } else {
             this.invisibleTrigger = this.physics.add.sprite(250, 130, `invisibleTrigger`).setImmovable(true);
@@ -201,15 +331,24 @@ class Play extends Phaser.Scene {
         }
     }
 
+    displayNPC5Dialog(avatar, npc1) {
+        // Display the dialog as well as pausing the physics so you can't move
+        this.testBox.setVisible(true);
+        this.testBox.setPosition(550, 200);
+        this.npc5Icon.setVisible(true);
+        this.dialogBoxNPC5.setVisible(true);
+        this.dialogBoxNPC5.setPosition(620, 200);
+        this.physics.pause();
+    }
+
     displayNPC2Dialog(avatar, npc2) {
         //Displaying the dialog for the second NPC depending on how many collectables are still on screen
         if (this.collectables.countActive() >= 1 && this.collectables.countActive() <= 9) {
+            this.testBox.setVisible(true);
+            this.testBox.setPosition(260, 750);
+            this.npc2Icon.setVisible(true);
             this.dialogBoxNPC1B.setVisible(true);
-            this.dialogBoxNPC1B.setPosition(100, 800);
-            this.physics.pause();
-        } else {
-            this.dialogBoxNPC2B.setVisible(true);
-            this.dialogBoxNPC2B.setPosition(100, 800);
+            this.dialogBoxNPC1B.setPosition(330, 750);
             this.physics.pause();
         }
     }
@@ -221,16 +360,30 @@ class Play extends Phaser.Scene {
         this.dialogBoxNPC2A.setVisible(false);
         this.dialogBoxNPC1B.setVisible(false);
         this.dialogBoxNPC2B.setVisible(false);
+        this.dialogBoxNPC5.setVisible(false);
         this.testBox.setVisible(false);
-        this.testBox1.setVisible(false);
+        this.dialogBoxSign.setVisible(false);
+        this.dialogBoxGate.setVisible(false);
         this.treeIcon.setVisible(false);
+        this.avatarIcon.setVisible(false);
         this.npc1Icon.setVisible(false);
+        this.npc2Icon.setVisible(false);
+        this.npc5Icon.setVisible(false);
+        this.bridgeInteractionBox.setVisible(false);
         this.physics.resume();
     }
 
     collectItem(avatar, item) {
         //Destroys the collectables
         item.destroy();
+
+        //Displaying the dialog for the first NPC depending on how many collectables are still on screen
+        if (this.collectables.countActive() >= 8) {
+            this.cameras.main.fadeOut(1000, 0, 0, 0)
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+            this.scene.start('play2')
+        })
+        } 
     }
 
     update() {
@@ -313,6 +466,14 @@ class Play extends Phaser.Scene {
             repeat: -1
         };
         this.anims.create(npcIdle2);
+
+        let npcIdle5 = {
+            key: "npcIdle5",
+            frames: this.anims.generateFrameNumbers("npc5", { frames: [0, 1] }),
+            frameRate: 2,
+            repeat: -1
+        };
+        this.anims.create(npcIdle5);
 
         let forwardAvatar = {
             key: `avatarWalkForward`,

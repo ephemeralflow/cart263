@@ -35,49 +35,21 @@ class Play2 extends Phaser.Scene {
         });
 
         this.invisibleTrigger.children.each(function (invisibleTriggerS) {
-            invisibleTriggerS.setPosition(400, 105);
+            invisibleTriggerS.setPosition(500, 705);
         }, this);
 
         //Loads the sprites of the NPC as well as the door and the star
-        this.npc3 = this.physics.add.sprite(350, 105, "npc3");
+        this.npc3 = this.physics.add.sprite(1000, 105, "npc3");
         this.door = this.physics.add.sprite(100, 105, "door").setImmovable(true);
-        this.star = this.physics.add.sprite(400, 105, "star");
+        this.star = this.physics.add.sprite(500, 705, "star");
         this.avatar = this.physics.add.sprite(200, 200, `avatar`);
 
         //Loads the colliders for the trees as well as the checkers and the door to call different functions
         this.physics.add.collider(this.avatar, this.trees);
         this.physics.add.collider(this.avatar, this.door, this.changeScene, null, this);
+        //When the NPC and the avatar collide, change the DEAD scene
         this.physics.add.collider(this.avatar, this.invisibleTrigger, this.collectStar, null, this);
-
-
-        {
-            //  Sets the appearance of the text shown
-            const configStyle = {
-                fontSize: '50px',
-                fontFamily: 'Arial',
-                color: '#ffffff',
-                align: 'center',
-                backgroundColor: '#ff00ff',
-                shadow: {
-                    color: '#000000',
-                    fill: true,
-                    offsetX: 2,
-                    offsetY: 2,
-                    blur: 8
-                }
-            }
-
-            //Makes the dialog for the NPC
-            const npc3Talk = {
-                text: 'Hello! Why are you here? Oh\nyou lost something? Right next to\nme is what you seek or whatever.',
-                style: configStyle
-            };
-
-            //sets the dialog box as well as the text goes in 
-            this.npc3Talk = this.make.text(npc3Talk);
-            this.npc3Talk.setVisible(false);
-        }
-
+      
         //Calls the animation function as well as makes the default animations the idle ones for each character on the screen
         this.createAnimations();
         this.npc3.play("idleNPC3", true)
@@ -85,7 +57,7 @@ class Play2 extends Phaser.Scene {
         this.avatar.play(`idle`);
 
         //Colliders between the avatar and the NPC as to activate the dialog
-        // this.physics.add.collider(this.avatar, this.npc3, this.displayNPC3Dialog, null, this);
+        this.physics.add.collider(this.avatar, this.npc3, this.endOfGame, null, this);
         //Colliders between the avatar and the star as to collect said star
         this.physics.add.collider(this.avatar, this.star, this.starCollect, null, this);
 
@@ -105,20 +77,11 @@ class Play2 extends Phaser.Scene {
         item.destroy();
     }
 
-    displayNPC3Dialog(avatar, npc3) {
-        // Display the dialog as well as stops physics
-        this.npc3Talk.setVisible(true);
-        this.npc3Talk.setPosition(25, 400);
-        this.physics.pause();
+    endOfGame() {
+        this.scene.start('death')
     }
 
-    //Hides the dialog as well as resumes the physics so you can move again
-    hideDialog() {
-        this.npc3Talk.setVisible(false);
-        this.physics.resume();
-    }
-
-    //calls the input function
+    //Calls the input function + makes the NPC approach the player 100 pixels per second
     update() {
         this.handleInput();
         this.physics.moveToObject(this.npc3,this.avatar,100)
@@ -127,10 +90,9 @@ class Play2 extends Phaser.Scene {
     changeScene() {
         //Change the scene to another state
         if (this.invisibleTrigger.countActive() == 0) {
-            this.scene.start("play3");
+            this.scene.start("ending");
         }
     }
-
 
     handleInput() {
         //When SPACE is pressed, call the hideDialog function
