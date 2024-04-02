@@ -155,7 +155,7 @@ class Play extends Phaser.Scene {
 
         //Code for the camera to follow the avatar
         this.cameras.main.startFollow(this.avatar, true, 0.05, 0.05);
-        this.cameras.main.setZoom(4)
+        
     }
 
     changeScene() {

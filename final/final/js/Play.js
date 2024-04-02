@@ -90,7 +90,7 @@ class Play extends Phaser.Scene {
 
         //Invisible block that literally only serves the purpose so that .countActive can be used for grabbing the star as countActive only works with this for some reason
         this.gateTrigger = this.physics.add.group({
-            key: 'invisibleTrigger',
+            key: 'notSoInvisibleTrigger',
             quantity: 1,
             immovable: true,
         });
@@ -98,7 +98,6 @@ class Play extends Phaser.Scene {
         this.gateTrigger.children.each(function (gateTriggerS) {
             gateTriggerS.setPosition(700, 60);
         }, this);
-
 
         //Adds the colliders between the avatar and different objects
         this.physics.add.collider(this.avatar, this.talkingTree, this.displayTreeDialog, null, this);
@@ -113,14 +112,14 @@ class Play extends Phaser.Scene {
         this.physics.add.overlap(this.avatar, this.bridgeInteractionTrigger, this.displayBridgeDialog, null, this);
 
         this.physics.add.collider(this.avatar, this.sign, this.displaySignDialog, null, this);
-        this.physics.add.collider(this.avatar, this.door, this.insideHouse, null, this);
 
         this.physics.add.overlap(this.avatar, this.gateTrigger, this.gateTriggerFarmer, null, this);
 
-        //this is supposed to when you talk to the farmer (orange) that the gate will disappear but RIGHT NOW its not doing that so I changed the number so the gate wouldnt be there for testing purposes
-        if (this.gateTrigger.countActive() == 2 ) {
+        
+        if (this.gateTrigger.countActive() == 1 ) {
             this.gate = this.physics.add.sprite(512, 165, `gate`).setImmovable(true);
-            this.physics.add.collider(this.avatar, this.gate, this.displayGateDialog, null, this);
+            // this.physics.add.collider(this.avatar, this.gate, this.displayGateDialog, null, this);
+            this.physics.add.collider(this.avatar, this.gate);
         }
 
         this.displayDialogBoxes()
@@ -272,6 +271,7 @@ class Play extends Phaser.Scene {
 
     gateTriggerFarmer(avatar, item){
         item.destroy();
+        this.gate.destroy()
     }
 
     displayTreeDialog(avatar, talkingTree) {
@@ -297,7 +297,8 @@ class Play extends Phaser.Scene {
     displaySignDialog() {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
-        this.testBox.setPosition(300, 200);
+        this.testBox.setScrollFactor(0)
+        this.testBox.setPosition(40, 200);
         this.avatarIcon.setVisible(true);
         this.avatarIcon.setPosition(305, 205);
         this.dialogBoxSign.setVisible(true);
@@ -308,7 +309,8 @@ class Play extends Phaser.Scene {
     displayBridgeDialog() {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
-        this.testBox.setPosition(40, 270);
+        this.testBox.setScrollFactor(0)
+        this.testBox.setPosition(40, 200);
         this.avatarIcon.setVisible(true);
         this.avatarIcon.setPosition(45, 275);
         this.bridgeInteractionBox.setVisible(true);
