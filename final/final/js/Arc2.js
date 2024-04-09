@@ -1,7 +1,7 @@
-class Play2 extends Phaser.Scene {
+class Arc2 extends Phaser.Scene {
     constructor() {
         super({
-            key: "play2"
+            key: "arc2"
         })
     }
 
@@ -91,7 +91,7 @@ class Play2 extends Phaser.Scene {
     changeScene() {
         //Change the scene to another state
         if (this.invisibleTrigger.countActive() == 0) {
-            this.scene.start("ending");
+            this.scene.start("arc3");
         }
     }
 

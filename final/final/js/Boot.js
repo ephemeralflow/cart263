@@ -68,6 +68,7 @@ class Boot extends Phaser.Scene {
         this.load.image("sign", "assets/images/sign.png")
         this.load.image("door", "assets/images/door.png")
         this.load.image("invisibleTrigger", "assets/images/invisibleTrigger.png")
+        this.load.image("invisibleTrigger1", "assets/images/invisibleTrigger1.png")
         this.load.image("notSoInvisibleTrigger", "assets/images/notSoInvisibleTrigger.png")
 
         this.load.image("grassImage", "assets/images/tilesImages/Grass.png")
@@ -88,7 +89,7 @@ class Boot extends Phaser.Scene {
 
 
         this.load.on("complete", () => {
-            this.scene.start("menu");
+            this.scene.start("arc3");
         })
     }
 

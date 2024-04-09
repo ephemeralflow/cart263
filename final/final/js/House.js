@@ -46,12 +46,67 @@ class House extends Phaser.Scene {
 
         this.doorTrigger = this.physics.add.sprite(255, 40, "invisibleTrigger").setImmovable(true);
         this.physics.add.collider(this.avatar, this.doorTrigger, this.changeScene, null, this);
-        // this.physics.add.collider(this.avatar, this.npc4, this.changeScene, null, this);
+        // this.physics.add.collider(this.avatar, this.npc4, this.displayNPC4Dialog, null, this);
+
+        // this.displayDialogBoxes()
+
+        {
+            //  Sets the appearance of the text shown
+            const configStyle = {
+                fontSize: '28px',
+                fontFamily: 'Arial',
+                color: '#ffffff',
+                align: 'center',
+                // backgroundColor: '#ff00ff',
+                shadow: {
+                    color: '#000000',
+                    fill: true,
+                    offsetX: 2,
+                    offsetY: 2,
+                    blur: 8
+                }
+            }
+
+            //Sets the text of everything that speaks
+            const npc4Interaction = {
+                text: "The person isn't acknowledging your existance",
+                style: configStyle
+            };
+
+            //sets the dialog box as well as the text goes in 
+            this.npc4Box = this.make.text(npc4Interaction);
+            this.npc4Box.setVisible(false);
+        }
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
         this.cameras.main.setZoom(2)
     }
+
+    // displayDialogBoxes() {
+    //     this.testBox = this.add.image(0, 0, "testBox").setOrigin(0)
+    //     this.testBox.setVisible(false);
+    //     this.avatarIcon = this.add.image(305, 205, "avatarIcon").setOrigin(0)
+    //     this.avatarIcon.setVisible(false);
+        
+    //     this.displayBoxLocations()
+    // }
+
+    // displayBoxLocations() {
+    //     this.testBox.setScrollFactor(0)
+    //     this.testBox.setPosition(240, 350);
+    //     this.avatarIcon.setScrollFactor(0)
+    //     this.avatarIcon.setPosition(245, 355);
+    // }
+
+    // displayNPC4Dialog(avatar, talkingTree) {
+    //     // Display the dialog as well as pausing the physics so you can't move
+    //     this.testBox.setVisible(true);
+    //     this.treeIcon.setVisible(true);
+    //     this.npc4Box.setVisible(true);
+    //     this.npc4Box.setPosition(110, 200);
+    //     this.physics.pause();
+    // }
 
     changeScene() {
         //Change the scene to another state
