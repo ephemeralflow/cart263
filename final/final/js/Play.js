@@ -1,7 +1,7 @@
-class Arc3 extends Phaser.Scene {
+class Play extends Phaser.Scene {
     constructor() {
         super({
-            key: "arc3"
+            key: "play"
         })
     }
 
@@ -33,7 +33,7 @@ class Arc3 extends Phaser.Scene {
         this.avatar = this.physics.add.sprite(150, 100, `avatar`);
         this.avatar.setSize(16, 20, true)
 
-        this.bridgeInteractionTrigger = this.physics.add.sprite(120, 250, `invisibleTrigger`);
+        this.bridgeInteractionTrigger =  this.physics.add.sprite(120, 250, `invisibleTrigger`);
 
         //Loads the fence layer + adds collisions between the avatar and fence
         let fencesBase = map.addTilesetImage("Fences", "fencesImage");
@@ -54,7 +54,7 @@ class Arc3 extends Phaser.Scene {
         //Loads the second NPC image and the collision box as well as making it immovable
         this.npc2 = this.physics.add.sprite(400, 700, "npc2").setImmovable(true);
         this.npc2.setSize(10, 20, true)
-
+        
         //Loads the fifth NPC image and the collision box as well as making it immovable
         this.npc5 = this.physics.add.sprite(700, 70, "npc5").setImmovable(true);
         this.npc5.setSize(10, 20, true)
@@ -90,23 +90,13 @@ class Arc3 extends Phaser.Scene {
 
         //Invisible block that literally only serves the purpose so that .countActive can be used for grabbing the star as countActive only works with this for some reason
         this.gateTrigger = this.physics.add.group({
-            key: 'invisibleTrigger',
+            key: 'notSoInvisibleTrigger',
             quantity: 1,
             immovable: true,
         });
 
         this.gateTrigger.children.each(function (gateTriggerS) {
             gateTriggerS.setPosition(700, 60);
-        }, this);
-
-        this.openerScene = this.physics.add.group({
-            key: 'invisibleTrigger1',
-            quantity: 1,
-            immovable: true,
-        });
-
-        this.openerScene.children.each(function (openerSceneA) {
-            openerSceneA.setPosition(150, 100);
         }, this);
 
         //Adds the colliders between the avatar and different objects
@@ -125,14 +115,14 @@ class Arc3 extends Phaser.Scene {
 
         this.physics.add.overlap(this.avatar, this.gateTrigger, this.gateTriggerFarmer, null, this);
 
-        this.physics.add.overlap(this.avatar, this.openerScene, this.displayOpenerDialog, null, this);
-
-
-        if (this.gateTrigger.countActive() == 1) {
+        
+        if (this.gateTrigger.countActive() == 1 ) {
             this.gate = this.physics.add.sprite(512, 165, `gate`).setImmovable(true);
-            this.physics.add.collider(this.avatar, this.gate, this.displayGateDialog, null, this);
+            // this.physics.add.collider(this.avatar, this.gate, this.displayGateDialog, null, this);
             this.physics.add.collider(this.avatar, this.gate);
         }
+
+        this.displayDialogBoxes()
 
         {
             //  Sets the appearance of the text shown
@@ -177,11 +167,6 @@ class Arc3 extends Phaser.Scene {
                 style: configStyle
             };
 
-            const openerText = {
-                text: "What just happened!?",
-                style: configStyle
-            };
-
             const npc1Talk = {
                 text: 'Hello!!!',
                 style: configStyle
@@ -213,10 +198,7 @@ class Arc3 extends Phaser.Scene {
 
             this.dialogBox = this.make.text(treeTalking);
             this.dialogBox.setVisible(false);
-
-            this.openerBox = this.make.text(openerText);
-            this.openerBox.setVisible(false);
-
+            
             this.dialogBoxSign = this.make.text(signText);
             this.dialogBoxSign.setVisible(false);
 
@@ -245,10 +227,6 @@ class Arc3 extends Phaser.Scene {
         //calls the animation function
         this.createAnimations();
 
-        this.displayDialogBoxes()
-
-        this.createCrops()
-
         //Makes the default animations the idle ones for each character on the screen
         this.avatar.play(`idle`);
         this.npc1.play("npcIdle1", true)
@@ -263,27 +241,6 @@ class Arc3 extends Phaser.Scene {
         this.cameras.main.setZoom(2)
     }
 
-    createCrops() {
-        const cropXPositions = [750, 770, 790, 830, 870];
-        this.cropGroup = this.physics.add.group();
-        for (let pos of cropXPositions) {
-            const numCrops = 10;
-            const crops = [];
-            for (let i = 0; i < numCrops; i++) {
-                const crop = this.physics.add.sprite(0, 0, `crop-image`);
-                crops.push(crop);
-            }
-            const line = new Phaser.Geom.Line(pos, 90, pos, 210);
-            Phaser.Actions.RandomLine(crops, line);
-            this.cropGroup.addMultiple(crops);
-        }
-        this.physics.add.overlap(this.avatar, this.cropGroup, this.cropDestroy, null, this);
-    }
-
-    cropDestroy(avatar, item) {
-        item.destroy();
-    }
-
     displayDialogBoxes() {
         this.testBox = this.add.image(0, 0, "testBox").setOrigin(0)
         this.testBox.setVisible(false);
@@ -294,24 +251,9 @@ class Arc3 extends Phaser.Scene {
         this.npc1Icon = this.add.image(105, 205, "npc1Icon").setOrigin(0)
         this.npc1Icon.setVisible(false);
         this.npc2Icon = this.add.image(265, 755, "npc2Icon").setOrigin(0)
-        this.npc2Icon.setVisible(false);
+        this.npc2Icon.setVisible(false); 
         this.npc5Icon = this.add.image(555, 205, "npc5Icon").setOrigin(0)
-        this.npc5Icon.setVisible(false);
-
-        this.displayBoxLocations()
-    }
-
-    displayBoxLocations() {
-        this.testBox.setScrollFactor(0)
-        this.testBox.setPosition(240, 350);
-        this.avatarIcon.setScrollFactor(0)
-        this.avatarIcon.setPosition(245, 355);
-        this.npc1Icon.setScrollFactor(0)
-        this.npc1Icon.setPosition(245, 355);
-        this.npc2Icon.setScrollFactor(0)
-        this.npc2Icon.setPosition(245, 355);
-        this.npc5Icon.setScrollFactor(0)
-        this.npc5Icon.setPosition(245, 355);
+        this.npc5Icon.setVisible(false); 
     }
 
     changeScene() {
@@ -327,7 +269,7 @@ class Arc3 extends Phaser.Scene {
         })
     }
 
-    gateTriggerFarmer(avatar, item) {
+    gateTriggerFarmer(avatar, item){
         item.destroy();
         this.gate.destroy()
     }
@@ -335,6 +277,7 @@ class Arc3 extends Phaser.Scene {
     displayTreeDialog(avatar, talkingTree) {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
+        this.testBox.setPosition(40, 200);
         this.treeIcon.setVisible(true);
         this.dialogBox.setVisible(true);
         this.dialogBox.setPosition(110, 200);
@@ -344,35 +287,32 @@ class Arc3 extends Phaser.Scene {
     displayGateDialog() {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
+        this.testBox.setPosition(40, 300);
         this.avatarIcon.setVisible(true);
         this.dialogBoxGate.setVisible(true);
-        this.dialogBoxGate.setScrollFactor(0)
-        this.dialogBoxGate.setPosition(325, 350);
+        this.dialogBoxGate.setPosition(110, 200);
         this.physics.pause();
     }
 
     displaySignDialog() {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
+        this.testBox.setScrollFactor(0)
+        this.testBox.setPosition(canvas, 200);
         this.avatarIcon.setVisible(true);
+        this.avatarIcon.setPosition(305, 205);
         this.dialogBoxSign.setVisible(true);
         this.dialogBoxSign.setPosition(370, 200);
-        this.physics.pause();
-    }
-
-    displayOpenerDialog() {
-        // Display the dialog as well as pausing the physics so you can't move
-        this.testBox.setVisible(true);
-        this.avatarIcon.setVisible(true);
-        this.openerBox.setVisible(true);
-        this.openerBox.setPosition(110, 200);
         this.physics.pause();
     }
 
     displayBridgeDialog() {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
+        this.testBox.setScrollFactor(0)
+        this.testBox.setPosition(40, 200);
         this.avatarIcon.setVisible(true);
+        this.avatarIcon.setPosition(45, 275);
         this.bridgeInteractionBox.setVisible(true);
         this.bridgeInteractionBox.setPosition(110, 270);
         this.physics.pause();
@@ -382,6 +322,7 @@ class Arc3 extends Phaser.Scene {
         //Displaying the dialog for the first NPC depending on how many collectables are still on screen
         if (this.collectables.countActive() >= 1 && this.collectables.countActive() <= 9) {
             this.testBox.setVisible(true);
+            this.testBox.setPosition(100, 200);
             this.npc1Icon.setVisible(true);
             this.dialogBoxNPC1A.setVisible(true);
             this.dialogBoxNPC1A.setPosition(170, 200);
@@ -395,6 +336,7 @@ class Arc3 extends Phaser.Scene {
     displayNPC5Dialog(avatar, npc1) {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
+        this.testBox.setPosition(550, 200);
         this.npc5Icon.setVisible(true);
         this.dialogBoxNPC5.setVisible(true);
         this.dialogBoxNPC5.setPosition(620, 200);
@@ -405,7 +347,7 @@ class Arc3 extends Phaser.Scene {
         //Displaying the dialog for the second NPC depending on how many collectables are still on screen
         if (this.collectables.countActive() >= 1 && this.collectables.countActive() <= 9) {
             this.testBox.setVisible(true);
-            // this.testBox.setPosition(260, 750);
+            this.testBox.setPosition(260, 750);
             this.npc2Icon.setVisible(true);
             this.dialogBoxNPC1B.setVisible(true);
             this.dialogBoxNPC1B.setPosition(330, 750);
@@ -422,7 +364,6 @@ class Arc3 extends Phaser.Scene {
         this.dialogBoxNPC2B.setVisible(false);
         this.dialogBoxNPC5.setVisible(false);
         this.testBox.setVisible(false);
-        this.openerBox.setVisible(false);
         this.dialogBoxSign.setVisible(false);
         this.dialogBoxGate.setVisible(false);
         this.treeIcon.setVisible(false);
@@ -441,10 +382,10 @@ class Arc3 extends Phaser.Scene {
         //Displaying the dialog for the first NPC depending on how many collectables are still on screen
         if (this.collectables.countActive() >= 8) {
             this.cameras.main.fadeOut(1000, 0, 0, 0)
-            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-                this.scene.start('play2')
-            })
-        }
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+            this.scene.start('play2')
+        })
+        } 
     }
 
     update() {
