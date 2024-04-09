@@ -242,35 +242,33 @@ class Arc1 extends Phaser.Scene {
     }
 
     displayDialogBoxes() {
-        this.testBox = this.add.image(0, 0, "testBox").setOrigin(0)
+        this.testBox = this.add.image(240, 350, "testBox").setOrigin(0)
+        this.testBox.setScrollFactor(0)
         this.testBox.setVisible(false);
+
         this.treeIcon = this.add.image(45, 205, "treeIcon").setOrigin(0)
         this.treeIcon.setVisible(false);
-        this.avatarIcon = this.add.image(305, 205, "avatarIcon").setOrigin(0)
-        this.avatarIcon.setVisible(false);
-        this.npc1Icon = this.add.image(105, 205, "npc1Icon").setOrigin(0)
-        this.npc1Icon.setVisible(false);
-        this.npc2Icon = this.add.image(265, 755, "npc2Icon").setOrigin(0)
-        this.npc2Icon.setVisible(false);
-        this.npc5Icon = this.add.image(555, 205, "npc5Icon").setOrigin(0)
-        this.npc5Icon.setVisible(false);
 
-        this.displayBoxLocations()
+        this.avatarIcon = this.add.image(245, 355, "avatarIcon").setOrigin(0)
+        this.avatarIcon.setScrollFactor(0)
+        this.avatarIcon.setVisible(false);
+
+        this.npc1Icon = this.add.image(245, 355, "npc1Icon").setOrigin(0)
+        this.npc1Icon.setScrollFactor(0)
+        this.npc1Icon.setVisible(false);
+
+        this.npc2Icon = this.add.image(245, 355, "npc2Icon").setOrigin(0)
+        this.npc2Icon.setScrollFactor(0)
+        this.npc2Icon.setVisible(false);
+
+        this.npc5Icon = this.add.image(245, 205, "npc5Icon").setOrigin(0)
+        this.npc5Icon.setScrollFactor(0)
+        this.npc5Icon.setVisible(false);
     }
 
     displayBoxLocations() {
-        this.testBox.setScrollFactor(0)
-        this.testBox.setPosition(240, 350);
-        this.avatarIcon.setScrollFactor(0)
-        this.avatarIcon.setPosition(245, 355);
-        this.npc1Icon.setScrollFactor(0)
-        this.npc1Icon.setPosition(245, 355);
-        this.npc2Icon.setScrollFactor(0)
-        this.npc2Icon.setPosition(245, 355);
-        this.npc5Icon.setScrollFactor(0)
-        this.npc5Icon.setPosition(245, 355);
-        this.dialogBoxNPC1A.setScrollFactor(0)
-        this.dialogBoxNPC1A.setPosition(170, 200);
+        // this.dialogBoxNPC1A.setScrollFactor(0)
+        // this.dialogBoxNPC1A.setPosition(170, 200);
     }
 
     changeScene() {
