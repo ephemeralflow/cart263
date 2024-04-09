@@ -89,7 +89,8 @@ class Boot extends Phaser.Scene {
 
 
         this.load.on("complete", () => {
-            this.scene.start("arc3");
+            // this.scene.start("arc1");
+            this.scene.launch("arc1");
         })
     }
 

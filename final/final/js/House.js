@@ -44,7 +44,7 @@ class House extends Phaser.Scene {
         this.npc4 = this.physics.add.sprite(120, 85, "npc4").setImmovable(true);
         this.npc4.setSize(10, 30, true)
 
-        this.doorTrigger = this.physics.add.sprite(255, 40, "invisibleTrigger").setImmovable(true);
+        this.doorTrigger = this.physics.add.sprite(255, 40, "notSoInvisibleTrigger").setImmovable(true);
         this.physics.add.collider(this.avatar, this.doorTrigger, this.changeScene, null, this);
         // this.physics.add.collider(this.avatar, this.npc4, this.displayNPC4Dialog, null, this);
 
@@ -88,7 +88,7 @@ class House extends Phaser.Scene {
     //     this.testBox.setVisible(false);
     //     this.avatarIcon = this.add.image(305, 205, "avatarIcon").setOrigin(0)
     //     this.avatarIcon.setVisible(false);
-        
+
     //     this.displayBoxLocations()
     // }
 
@@ -110,10 +110,20 @@ class House extends Phaser.Scene {
 
     changeScene() {
         //Change the scene to another state
-        this.cameras.main.fadeOut(1000, 0, 0, 0)
-        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-            this.scene.start('arc1')
-        })
+        // this.cameras.main.fadeOut(1000, 0, 0, 0)
+        // this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+        //     // this.scene.start('arc1')
+        //     // this.scene.launch('arc1', "house")
+        //     // this.scene.setVisible(false, "house")
+        //     // this.scene.setVisible(true, "arc1")
+        //     // this.scene.remove("house")
+        //     this.scene.launch('arc1')
+        // })
+        this.scene.setVisible(false, "house")
+        this.scene.setVisible(true, "arc1")
+        this.scene.resume("arc1")
+        this.scene.pause("house")
+
     }
 
     update() {

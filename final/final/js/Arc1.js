@@ -277,11 +277,12 @@ class Arc1 extends Phaser.Scene {
     }
 
     insideHouse() {
-        //Change the scene to another state
-        this.cameras.main.fadeOut(1000, 0, 0, 0)
-        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-            this.scene.start('house')
-        })
+        console.log("hitDoorCollider")
+        this.scene.pause("arc1")
+        this.scene.resume("house")
+        this.scene.setVisible(false, "arc1")
+        this.avatar.y += 10
+        this.scene.launch("house");
     }
 
     gateTriggerFarmer(avatar, item) {
