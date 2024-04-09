@@ -238,7 +238,7 @@ class Arc1 extends Phaser.Scene {
 
         //Code for the camera to follow the avatar and also to be closer
         this.cameras.main.startFollow(this.avatar, true, 0.05, 0.05);
-        // this.cameras.main.setZoom(2)
+        this.cameras.main.setZoom(2)
     }
 
     displayDialogBoxes() {
@@ -266,7 +266,7 @@ class Arc1 extends Phaser.Scene {
         this.npc5Icon.setVisible(false);
     }
 
-    displayBoxLocations() {
+    displayTextLocations() {
         // this.dialogBoxNPC1A.setScrollFactor(0)
         // this.dialogBoxNPC1A.setPosition(170, 200);
     }
