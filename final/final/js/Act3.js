@@ -30,23 +30,23 @@ class Act3 extends Phaser.Scene {
         let plants = map.createLayer("plantLife", plantsBase, 0, 0);
 
         //AVATAR ENTER ANIMATION 
-        let avatarEnterAnimation = {
+        let avatarEnterAnim = {
             key: `avatarEnterAnim`,
-            frames: this.anims.generateFrameNumbers(`avatarEnterAnimation`, {
+            frames: this.anims.generateFrameNumbers(`avatarEnterAnim`, {
                 start: 0,
                 end: 19
             }),
             frameRate: 12,
         };
-        this.anims.create(avatarEnterAnimation);
+        this.anims.create(avatarEnterAnim);
 
-        this.avatarEnterAnim = this.physics.add.sprite(200, 105, "avatarEnterAnimation").setImmovable(true);
+        this.avatarEnterAnim = this.physics.add.sprite(200, 105, "avatarEnterAnim").setImmovable(true);
         this.avatarEnterAnim.setSize(10, 20, true)
-        this.avatarEnterAnim.play(`avatarEnterAnimation`, true);
+        this.avatarEnterAnim.play(`avatarEnterAnim`, true);
 
-        // avatarEnterAnim.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
-        //     this.releaseItem();
-        // }, this);
+        avatarEnterAnim.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
+            // this.releaseItem();
+        }, this);
 
         //Loading Avatar
         this.avatar = this.physics.add.sprite(150, 100, `avatar`);
