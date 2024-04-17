@@ -23,10 +23,10 @@ class Boot extends Phaser.Scene {
             endFrame: 28,
         })
 
-        this.load.spritesheet("avatarEnterAnim", "assets/images/avatarEnterAnim.png", {
+        this.load.spritesheet("avatarEnterSprite", "assets/images/avatarEnterAnim.png", {
             frameWidth: 32,
             frameHeight: 64,
-            endFrame: 19,
+            endFrame: 20,
         })
 
         this.load.spritesheet("npc1", "assets/images/npc1.png", {
