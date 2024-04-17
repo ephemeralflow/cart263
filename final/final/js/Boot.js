@@ -59,6 +59,11 @@ class Boot extends Phaser.Scene {
             frameHeight: 32,
             endFrame: 8,
         })
+        this.load.spritesheet("out", "assets/images/out.png", {
+            frameWidth: 128,
+            frameHeight: 64,
+            endFrame: 15,
+        })
 
         //load
         this.load.image("testIcon", "assets/images/testIcon.png")
@@ -68,6 +73,7 @@ class Boot extends Phaser.Scene {
         this.load.image("npc1Icon", "assets/images/npc1Icon.png")
         this.load.image("npc2Icon", "assets/images/npc2Icon.png")
         this.load.image("npc5Icon", "assets/images/npc5Icon.png")
+        this.load.image("overlay", "assets/images/overlay.png")
 
         //Loading MAP images
         this.load.image("tree", "assets/images/Tree.png")

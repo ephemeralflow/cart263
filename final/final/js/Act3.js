@@ -50,7 +50,7 @@ class Act3 extends Phaser.Scene {
         this.npc5 = this.physics.add.sprite(700, 70, "npc5").setImmovable(true);
         this.npc5.setSize(10, 20, true)
 
-        this.avatar = this.physics.add.sprite(150, 100, `xButton`);
+        this.avatar = this.physics.add.sprite(150, 100, `avatar`);
         this.physics.pause();
         this.avatar.setSize(10, 20, true)
 
@@ -143,7 +143,7 @@ class Act3 extends Phaser.Scene {
 
         //If the avatar collides with the collectable plants, it will call for the collectItem function
         this.physics.add.overlap(this.avatar, this.collectables, this.collectItem, null, this);
-        this.physics.add.collider(this.avatar, this.door, this.insideHouse, null, this);
+        this.physics.add.collider(this.avatar, this.door, this.displayHouseDialog, null, this);
 
         this.physics.add.overlap(this.avatar, this.bridgeInteractionTrigger, this.displayBridgeDialog, null, this);
 
@@ -213,12 +213,13 @@ class Act3 extends Phaser.Scene {
         this.physics.add.overlap(this.avatar, this.cropGroup, this.cropDestroy, null, this);
     }
 
+    //Destroys the crops
     cropDestroy(avatar, item) {
         item.destroy();
 
-        if (this.cropGroup.countActive() == 0) {
-            this.gate.destroy()
-        }
+        // if (this.cropGroup.countActive() == 0) {
+        //     this.gate.destroy()
+        // }
     }
 
     displayDialogBoxes() {
@@ -241,9 +242,18 @@ class Act3 extends Phaser.Scene {
         this.npc2Icon.setScrollFactor(0)
         this.npc2Icon.setVisible(false);
 
-        this.npc5Icon = this.add.image(245, 205, "npc5Icon").setOrigin(0)
+        this.npc5Icon = this.add.image(245, 355, "npc5Icon").setOrigin(0)
         this.npc5Icon.setScrollFactor(0)
         this.npc5Icon.setVisible(false);
+
+        this.overlay = this.add.image(0,0, "overlay").setOrigin(0)
+        this.overlay.setBlendMode(Phaser.BlendModes.ADD);
+        this.overlay.setScrollFactor(0)
+        this.overlay.setVisible(false);
+
+        this.getOut = this.physics.add.sprite(400, 380, `out`);
+        this.getOut.setScrollFactor(0)
+        this.getOut.setVisible(false);
     }
 
     displayTextLocations() {
@@ -259,8 +269,11 @@ class Act3 extends Phaser.Scene {
         this.dialogBoxNPC2.setScrollFactor(0)
         this.dialogBoxNPC2.setPosition(325, 350);
 
-        this.dialogBoxNPC5.setScrollFactor(0)
-        this.dialogBoxNPC5.setPosition(325, 350);
+        this.npc5dialogBox1.setScrollFactor(0)
+        this.npc5dialogBox1.setPosition(325, 350);
+
+        this.npc5dialogBox2.setScrollFactor(0)
+        this.npc5dialogBox2.setPosition(325, 350);
 
         this.dialogBoxGate.setScrollFactor(0) 
         this.dialogBoxGate.setPosition(325, 350);
@@ -298,6 +311,14 @@ class Act3 extends Phaser.Scene {
         this.physics.pause();
     }
 
+    displayHouseDialog() {
+        this.testBox.setVisible(true);
+        this.overlay.setVisible(true);
+        this.getOut.setVisible(true);
+        this.getOut.play("outAnim", true)
+        this.physics.pause();
+    }
+
     displayGateDialog() {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
@@ -319,7 +340,7 @@ class Act3 extends Phaser.Scene {
         this.testBox.setVisible(true);
         this.avatarIcon.setVisible(true);
         this.openerBox.setVisible(true);
-
+        
         this.physics.pause();
         item.destroy();
     }
@@ -347,10 +368,19 @@ class Act3 extends Phaser.Scene {
 
     displayNPC5Dialog(avatar, npc1) {
         // Display the dialog as well as pausing the physics so you can't move
-        this.testBox.setVisible(true);
-        this.npc5Icon.setVisible(true);
-        this.dialogBoxNPC5.setVisible(true);
-        this.physics.pause();
+
+        if (this.cropGroup.countActive() >= 1) {
+            this.testBox.setVisible(true);
+            this.npc5Icon.setVisible(true);
+            this.npc5dialogBox1.setVisible(true);
+            this.physics.pause();
+        } else {
+            this.testBox.setVisible(true);
+            this.npc5Icon.setVisible(true);
+            this.npc5dialogBox2.setVisible(true);
+            this.physics.pause();
+            this.gate.destroy()
+        }
     }
 
     displayNPC2Dialog(avatar, npc2) {
@@ -370,7 +400,8 @@ class Act3 extends Phaser.Scene {
         this.dialogBoxNPC2A.setVisible(false);
         this.dialogBoxNPC2.setVisible(false);
         this.dialogBoxNPC2B.setVisible(false);
-        this.dialogBoxNPC5.setVisible(false);
+        this.npc5dialogBox1.setVisible(false);
+        this.npc5dialogBox2.setVisible(false);
         this.testBox.setVisible(false);
         this.openerBox.setVisible(false);
         this.dialogBoxSign.setVisible(false);
@@ -380,7 +411,9 @@ class Act3 extends Phaser.Scene {
         this.npc1Icon.setVisible(false);
         this.npc2Icon.setVisible(false);
         this.npc5Icon.setVisible(false);
+        this.overlay.setVisible(false);
         this.bridgeInteractionBox.setVisible(false);
+        this.getOut.setVisible(false);
         this.physics.resume();
     }
 
@@ -518,10 +551,15 @@ class Act3 extends Phaser.Scene {
                 style: configStyle
             };
 
-            const npc5Talk = {
-                text: "The gate's locked? \nI'll fix that",
+            const npc5Talk1 = {
+                text: "Can you grab\n▮▮▮▮▮▮▮▮.",
                 style: configStyle
-            };
+            }
+
+            const npc5Talk2 = {
+                text: "Okay You Can\nPass Now",
+                style: configStyle
+            }
 
             //sets the dialog box as well as the text goes in 
             this.bridgeInteractionBox = this.make.text(bridgeInteraction);
@@ -554,8 +592,11 @@ class Act3 extends Phaser.Scene {
             this.dialogBoxNPC2B = this.make.text(npc2Talk2);
             this.dialogBoxNPC2B.setVisible(false);
 
-            this.dialogBoxNPC5 = this.make.text(npc5Talk);
-            this.dialogBoxNPC5.setVisible(false);
+            this.npc5dialogBox1 = this.make.text(npc5Talk1);
+            this.npc5dialogBox1.setVisible(false);
+
+            this.npc5dialogBox2 = this.make.text(npc5Talk2);
+            this.npc5dialogBox2.setVisible(false);
         }
     }
 
@@ -635,5 +676,15 @@ class Act3 extends Phaser.Scene {
             repeat: -1
         };
         this.anims.create(leftSideAvatar);
+
+        let outWords = {
+            key: `outAnim`,
+            frames: this.anims.generateFrameNumbers(`out`, {
+                start: 0,
+                end: 15
+            }),
+            frameRate: 8,
+        };
+        this.anims.create(outWords);
     }
 }
