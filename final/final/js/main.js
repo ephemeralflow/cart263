@@ -16,7 +16,7 @@ let config = {
         arcade: {
         }
     },
-    scene: [Boot, Menu, Arc1, House, Arc2, Arc3, Ending, Death],
+    scene: [Boot, Menu, Act1, House, Act2, Act3, Ending, Death],
     antialias: false,
 }
 

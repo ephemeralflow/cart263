@@ -22,6 +22,13 @@ class Boot extends Phaser.Scene {
             frameHeight: 32,
             endFrame: 28,
         })
+
+        this.load.spritesheet("avatarEnterAnim", "assets/images/avatarEnterAnim.png", {
+            frameWidth: 32,
+            frameHeight: 64,
+            endFrame: 19,
+        })
+
         this.load.spritesheet("npc1", "assets/images/npc1.png", {
             frameWidth: 32,
             frameHeight: 32,
@@ -90,7 +97,7 @@ class Boot extends Phaser.Scene {
 
         this.load.on("complete", () => {
             // this.scene.start("arc1");
-            this.scene.launch("arc1");
+            this.scene.launch("act3");
         })
     }
 

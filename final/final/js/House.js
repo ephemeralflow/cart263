@@ -120,8 +120,8 @@ class House extends Phaser.Scene {
         //     this.scene.launch('arc1')
         // })
         this.scene.setVisible(false, "house")
-        this.scene.setVisible(true, "arc1")
-        this.scene.resume("arc1")
+        this.scene.setVisible(true, "act1")
+        this.scene.resume("act1")
         this.scene.pause("house")
 
     }
