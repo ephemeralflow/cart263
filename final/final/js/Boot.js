@@ -7,14 +7,16 @@ class Boot extends Phaser.Scene {
 
     preload() {
         //Loading Assets
-        this.load.image("titleBG", "assets/images/AdobeStock_501202742.jpg")
-        this.load.image("playButton", "assets/images/playButton.png")
-        this.load.image("instructionButton", "assets/images/instructionButton.png")
-        this.load.image("instructionPage", "assets/images/instructionPage.png")
-        this.load.image("xButton", "assets/images/xButton.png")
-        this.load.image("endingCard", "assets/images/endingCard.png")
-        this.load.image("deathImage", "assets/images/death.jpg")
-        this.load.image("playAgain", "assets/images/playAgain.png")
+        this.load.image("titleBG", "assets/images/mainMenu/menu.jpg")
+        this.load.image("playButton", "assets/images/mainMenu/playButton.png")
+        this.load.image("instructionButton", "assets/images/mainMenu/instructionButton.png")
+        this.load.image("instructionPage", "assets/images/mainMenu/instructionPage.png")
+        this.load.image("creditButton", "assets/images/mainMenu/creditsText.png")
+        this.load.image("creditPage", "assets/images/mainMenu/creditPage.png")
+        this.load.image("xButton", "assets/images/mainMenu/xButton.png")
+        this.load.image("endingCard", "assets/images/mainMenu/endingCard.png")
+        this.load.image("deathImage", "assets/images/mainMenu/death.jpg")
+        this.load.image("playAgain", "assets/images/mainMenu/playAgain.png")
 
         //Loading the spritesheets for the main avatar and the NPCs
         this.load.spritesheet("avatar", "assets/images/avatar.png", {
@@ -102,8 +104,7 @@ class Boot extends Phaser.Scene {
 
 
         this.load.on("complete", () => {
-            // this.scene.start("arc1");
-            this.scene.launch("act3");
+            this.scene.launch("house");
         })
     }
 

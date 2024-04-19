@@ -149,7 +149,7 @@ class Act3 extends Phaser.Scene {
 
         this.physics.add.collider(this.avatar, this.sign, this.displaySignDialog, null, this);
 
-        this.physics.add.overlap(this.avatar, this.gateTrigger, this.gateTriggerFarmer, null, this);
+        // this.physics.add.overlap(this.avatar, this.gateTrigger, this.gateTriggerFarmer, null, this);
 
         if (this.openerScene.countActive() == 1) {
             this.physics.add.overlap(this.avatar, this.openerScene, this.   displayOpenerDialog, null, this);

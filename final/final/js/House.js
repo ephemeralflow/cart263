@@ -32,10 +32,7 @@ class House extends Phaser.Scene {
         this.avatar = this.physics.add.sprite(255, 90, `avatar`);
         this.avatar.setSize(16, 20, true)
 
-        //Calls the animation function as well as makes the default animations the idle ones for each character on the screen
-        this.createAnimations();
-        this.avatar.play(`idle`);
-        // this.npc4.play("idleNPC4", true)
+        
 
         furniture.setCollisionByProperty({ collides: true });
         this.physics.add.collider(this.avatar, furniture);
@@ -44,81 +41,90 @@ class House extends Phaser.Scene {
         this.npc4 = this.physics.add.sprite(120, 85, "npc4").setImmovable(true);
         this.npc4.setSize(10, 30, true)
 
-        this.doorTrigger = this.physics.add.sprite(255, 40, "notSoInvisibleTrigger").setImmovable(true);
+        this.doorTrigger = this.physics.add.sprite(255, 40, "invisibleTrigger").setImmovable(true);
         this.physics.add.collider(this.avatar, this.doorTrigger, this.changeScene, null, this);
-        // this.physics.add.collider(this.avatar, this.npc4, this.displayNPC4Dialog, null, this);
+        this.physics.add.collider(this.avatar, this.npc4, this.displayNPC4Dialog, null, this);
 
-        // this.displayDialogBoxes()
+        //Calls the function for the dialog boxes themselves
+        this.displayDialogBoxes()
 
-        {
-            //  Sets the appearance of the text shown
-            const configStyle = {
-                fontSize: '28px',
-                fontFamily: 'Arial',
-                color: '#ffffff',
-                align: 'center',
-                // backgroundColor: '#ff00ff',
-                shadow: {
-                    color: '#000000',
-                    fill: true,
-                    offsetX: 2,
-                    offsetY: 2,
-                    blur: 8
-                }
-            }
+        //Calls the function for the text
+        this.dialogBoxFunction()
 
-            //Sets the text of everything that speaks
-            const npc4Interaction = {
-                text: "The person isn't acknowledging your existance",
-                style: configStyle
-            };
+        //Calls the function to display the location of the text
+        this.displayTextLocations()
 
-            //sets the dialog box as well as the text goes in 
-            this.npc4Box = this.make.text(npc4Interaction);
-            this.npc4Box.setVisible(false);
-        }
+        //Calls the animation function as well as makes the default animations the idle ones for each character on the screen
+        this.createAnimations();
+        this.avatar.play(`idle`);
+        this.npc4.play("idleNPC4")
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
         this.cameras.main.setZoom(2)
     }
 
-    // displayDialogBoxes() {
-    //     this.testBox = this.add.image(0, 0, "testBox").setOrigin(0)
-    //     this.testBox.setVisible(false);
-    //     this.avatarIcon = this.add.image(305, 205, "avatarIcon").setOrigin(0)
-    //     this.avatarIcon.setVisible(false);
+    displayDialogBoxes() {
+        this.testBox = this.add.image(240, 350, "testBox").setOrigin(0)
+        this.testBox.setScrollFactor(0)
+        this.testBox.setVisible(false);
 
-    //     this.displayBoxLocations()
-    // }
+        this.avatarIcon = this.add.image(245, 355, "avatarIcon").setOrigin(0)
+        this.avatarIcon.setScrollFactor(0)
+        this.avatarIcon.setVisible(false);
+    }
 
-    // displayBoxLocations() {
-    //     this.testBox.setScrollFactor(0)
-    //     this.testBox.setPosition(240, 350);
-    //     this.avatarIcon.setScrollFactor(0)
-    //     this.avatarIcon.setPosition(245, 355);
-    // }
+    displayTextLocations() {
+        this.dialogBoxNPC4.setScrollFactor(0)
+        this.dialogBoxNPC4.setPosition(325, 350);
+    }
 
-    // displayNPC4Dialog(avatar, talkingTree) {
-    //     // Display the dialog as well as pausing the physics so you can't move
-    //     this.testBox.setVisible(true);
-    //     this.treeIcon.setVisible(true);
-    //     this.npc4Box.setVisible(true);
-    //     this.npc4Box.setPosition(110, 200);
-    //     this.physics.pause();
-    // }
+    displayNPC4Dialog(avatar, talkingTree) {
+        // Display the dialog as well as pausing the physics so you can't move
+        this.testBox.setVisible(true);
+        this.avatarIcon.setVisible(true);
+        this.dialogBoxNPC4.setVisible(true);
+        
+        this.physics.pause();
+    }
+
+    //Hides the dialog as well as resumes the physics so you can move again
+    hideDialog() {
+        this.testBox.setVisible(false);
+        this.avatarIcon.setVisible(false);
+        this.dialogBoxNPC4.setVisible(false);
+        this.physics.resume();
+    }
+
+    dialogBoxFunction() {
+        //  Sets the appearance of the text shown
+        const configStyle = {
+            fontSize: '28px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            align: 'center',
+            shadow: {
+                color: '#000000',
+                fill: true,
+                offsetX: 2,
+                offsetY: 2,
+                blur: 8
+            }
+        }
+
+        //Sets the text of everything that speaks
+        const npc4Interaction = {
+            text: "Hello? ...hm no\nresponse",
+            style: configStyle
+        };
+
+        //sets the dialog box as well as the text goes in 
+        this.dialogBoxNPC4 = this.make.text(npc4Interaction);
+        this.dialogBoxNPC4.setVisible(false);
+    }
 
     changeScene() {
         //Change the scene to another state
-        // this.cameras.main.fadeOut(1000, 0, 0, 0)
-        // this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-        //     // this.scene.start('arc1')
-        //     // this.scene.launch('arc1', "house")
-        //     // this.scene.setVisible(false, "house")
-        //     // this.scene.setVisible(true, "arc1")
-        //     // this.scene.remove("house")
-        //     this.scene.launch('arc1')
-        // })
         this.scene.setVisible(false, "house")
         this.scene.setVisible(true, "act1")
         this.scene.resume("act1")

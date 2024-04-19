@@ -3,6 +3,8 @@ I actually don't know what to call this game
 Scarlett Perez
 
 A silly game where you help some random person with stuff because you have no life and also no way out and stuff.
+
+aha! This started as editing my gamejam but guess what! The only thing that really stayed was the sprites! Because I kind of added more and changed stuff around so... It's practically a new game now so um... yeah knew I had to mention that somewhere--
 */
 
 "use strict";

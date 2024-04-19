@@ -122,107 +122,14 @@ class Act1 extends Phaser.Scene {
             this.physics.add.collider(this.avatar, this.gate);
         }
 
-        {
-            //  Sets the appearance of the text shown
-            const configStyle = {
-                fontSize: '28px',
-                fontFamily: 'Arial',
-                color: '#ffffff',
-                align: 'center',
-                // backgroundColor: '#ff00ff',
-                shadow: {
-                    color: '#000000',
-                    fill: true,
-                    offsetX: 2,
-                    offsetY: 2,
-                    blur: 8
-                }
-            }
-
-            //Sets the text of everything that speaks
-            const treeTalking = {
-                text: 'hi im a tree',
-                style: configStyle
-            };
-
-            const bridgeInteraction = {
-                text: 'It seems the bridge \nis broken.',
-                style: configStyle
-            };
-
-            const signText = {
-                text: '... house.',
-                style: configStyle
-            };
-
-            const gateText = {
-                text: "It's locked.",
-                style: configStyle
-            };
-
-            const scene1Text = {
-                text: "What's happening!?",
-                style: configStyle
-            };
-
-            const npc1Talk = {
-                text: 'Hello!!!',
-                style: configStyle
-            };
-
-            const npc1Talk2 = {
-                text: 'Thank you!!!',
-                style: configStyle
-            };
-
-            const npc2Talk = {
-                text: '...',
-                style: configStyle
-            };
-
-            const npc2Talk2 = {
-                text: 'I lost something.',
-                style: configStyle
-            };
-
-            const npc5Talk = {
-                text: "The gate's locked? \nI'll fix that",
-                style: configStyle
-            };
-
-            //sets the dialog box as well as the text goes in 
-            this.bridgeInteractionBox = this.make.text(bridgeInteraction);
-            this.bridgeInteractionBox.setVisible(false);
-
-            this.dialogBox = this.make.text(treeTalking);
-            this.dialogBox.setVisible(false);
-
-            this.dialogBoxSign = this.make.text(signText);
-            this.dialogBoxSign.setVisible(false);
-
-            this.dialogBoxGate = this.make.text(gateText);
-            this.dialogBoxGate.setVisible(false);
-
-            this.dialogBoxScene = this.make.text(scene1Text);
-            this.dialogBoxScene.setVisible(false);
-
-            this.dialogBoxNPC1A = this.make.text(npc1Talk);
-            this.dialogBoxNPC1A.setVisible(false);
-
-            this.dialogBoxNPC2A = this.make.text(npc1Talk2);
-            this.dialogBoxNPC2A.setVisible(false);
-
-            this.dialogBoxNPC1B = this.make.text(npc2Talk);
-            this.dialogBoxNPC1B.setVisible(false);
-
-            this.dialogBoxNPC2B = this.make.text(npc2Talk2);
-            this.dialogBoxNPC2B.setVisible(false);
-
-            this.dialogBoxNPC5 = this.make.text(npc5Talk);
-            this.dialogBoxNPC5.setVisible(false);
-        }
-
+        //Calls the function for the dialog boxes themselves
         this.displayDialogBoxes()
+
+        //Calls the function for the text
+        this.dialogBoxFunction()
+
+        //Calls the function to display the location of the text
+        this.displayTextLocations()
 
         //calls the animation function
         this.createAnimations();
@@ -261,14 +168,29 @@ class Act1 extends Phaser.Scene {
         this.npc2Icon.setScrollFactor(0)
         this.npc2Icon.setVisible(false);
 
-        this.npc5Icon = this.add.image(245, 205, "npc5Icon").setOrigin(0)
+        this.npc5Icon = this.add.image(245, 355, "npc5Icon").setOrigin(0)
         this.npc5Icon.setScrollFactor(0)
         this.npc5Icon.setVisible(false);
     }
 
     displayTextLocations() {
-        // this.dialogBoxNPC1A.setScrollFactor(0)
-        // this.dialogBoxNPC1A.setPosition(170, 200);
+        this.dialogBoxNPC1A.setScrollFactor(0)
+        this.dialogBoxNPC1A.setPosition(325, 350);
+
+        this.dialogBoxNPC1B.setScrollFactor(0)
+        this.dialogBoxNPC1B.setPosition(325, 350);
+
+        this.dialogBoxNPC5.setScrollFactor(0)
+        this.dialogBoxNPC5.setPosition(325, 350);
+
+        this.dialogBoxGate.setScrollFactor(0) 
+        this.dialogBoxGate.setPosition(325, 350);
+
+        this.dialogBoxSign.setScrollFactor(0) 
+        this.dialogBoxSign.setPosition(325, 350);
+
+        this.bridgeInteractionBox.setScrollFactor(0) 
+        this.bridgeInteractionBox.setPosition(325, 350);
     }
 
     changeScene() {
@@ -276,8 +198,8 @@ class Act1 extends Phaser.Scene {
         this.scene.start("act2");
     }
 
+    //pause the main act of the game (main area) to instead start the inside of the house instead. When you leave the house also move the avatar + 10 pixels in the y direction so the user wouldn't walk into the trigger again
     insideHouse() {
-        console.log("hitDoorCollider")
         this.scene.pause("act1")
         this.scene.resume("house")
         this.scene.setVisible(false, "act1")
@@ -305,7 +227,6 @@ class Act1 extends Phaser.Scene {
         this.avatarIcon.setVisible(true);
         this.dialogBoxGate.setVisible(true);
         this.dialogBoxGate.setScrollFactor(0)
-        this.dialogBoxGate.setPosition(325, 350);
         this.physics.pause();
     }
 
@@ -314,7 +235,6 @@ class Act1 extends Phaser.Scene {
         this.testBox.setVisible(true);
         this.avatarIcon.setVisible(true);
         this.dialogBoxSign.setVisible(true);
-        this.dialogBoxSign.setPosition(370, 200);
         this.physics.pause();
     }
 
@@ -323,7 +243,6 @@ class Act1 extends Phaser.Scene {
         this.testBox.setVisible(true);
         this.avatarIcon.setVisible(true);
         this.bridgeInteractionBox.setVisible(true);
-        this.bridgeInteractionBox.setPosition(110, 270);
         this.physics.pause();
     }
 
@@ -346,7 +265,6 @@ class Act1 extends Phaser.Scene {
         this.testBox.setVisible(true);
         this.npc5Icon.setVisible(true);
         this.dialogBoxNPC5.setVisible(true);
-        this.dialogBoxNPC5.setPosition(620, 200);
         this.physics.pause();
     }
 
@@ -357,7 +275,6 @@ class Act1 extends Phaser.Scene {
             // this.testBox.setPosition(260, 750);
             this.npc2Icon.setVisible(true);
             this.dialogBoxNPC1B.setVisible(true);
-            this.dialogBoxNPC1B.setPosition(330, 750);
             this.physics.pause();
         }
     }
@@ -445,6 +362,108 @@ class Act1 extends Phaser.Scene {
         else {
             this.avatar.play(`idle`, true);
         }
+    }
+
+    dialogBoxFunction() {
+        
+        //  Sets the appearance of the text shown
+        const configStyle = {
+            fontSize: '28px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            align: 'center',
+            // backgroundColor: '#ff00ff',
+            shadow: {
+                color: '#000000',
+                fill: true,
+                offsetX: 2,
+                offsetY: 2,
+                blur: 8
+            }
+        }
+
+        //Sets the text of everything that speaks
+        const treeTalking = {
+            text: 'hi im a tree',
+            style: configStyle
+        };
+
+        const bridgeInteraction = {
+            text: 'It seems the bridge \nis broken.',
+            style: configStyle
+        };
+
+        const signText = {
+            text: '... house.',
+            style: configStyle
+        };
+
+        const gateText = {
+            text: "It's locked.",
+            style: configStyle
+        };
+
+        const scene1Text = {
+            text: "What's happening!?",
+            style: configStyle
+        };
+
+        const npc1Talk = {
+            text: 'Hello!!!',
+            style: configStyle
+        };
+
+        const npc1Talk2 = {
+            text: 'Thank you!!!',
+            style: configStyle
+        };
+
+        const npc2Talk = {
+            text: '...',
+            style: configStyle
+        };
+
+        const npc2Talk2 = {
+            text: 'I lost something.',
+            style: configStyle
+        };
+
+        const npc5Talk = {
+            text: "The gate's locked? \nI'll fix that",
+            style: configStyle
+        };
+
+        //sets the dialog box as well as the text goes in 
+        this.bridgeInteractionBox = this.make.text(bridgeInteraction);
+        this.bridgeInteractionBox.setVisible(false);
+
+        this.dialogBox = this.make.text(treeTalking);
+        this.dialogBox.setVisible(false);
+
+        this.dialogBoxSign = this.make.text(signText);
+        this.dialogBoxSign.setVisible(false);
+
+        this.dialogBoxGate = this.make.text(gateText);
+        this.dialogBoxGate.setVisible(false);
+
+        this.dialogBoxScene = this.make.text(scene1Text);
+        this.dialogBoxScene.setVisible(false);
+
+        this.dialogBoxNPC1A = this.make.text(npc1Talk);
+        this.dialogBoxNPC1A.setVisible(false);
+
+        this.dialogBoxNPC2A = this.make.text(npc1Talk2);
+        this.dialogBoxNPC2A.setVisible(false);
+
+        this.dialogBoxNPC1B = this.make.text(npc2Talk);
+        this.dialogBoxNPC1B.setVisible(false);
+
+        this.dialogBoxNPC2B = this.make.text(npc2Talk2);
+        this.dialogBoxNPC2B.setVisible(false);
+
+        this.dialogBoxNPC5 = this.make.text(npc5Talk);
+        this.dialogBoxNPC5.setVisible(false);
+        
     }
 
     //Create the animations for the characters (such as idle and walking for the main avatar)
