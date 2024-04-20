@@ -7,6 +7,8 @@ As for the code, the whole phaser site, Pippin and Mathilde. With my honorable m
 
 A silly game where you help some random person with stuff because you have no life and also no way out and stuff.
 
+little warning, I have no control on how it appears in your screen but I have realized that depending on how the pixels are formed, it can actually look a bit weird depending on your screen resolution????? I only noticed because I had a second screen for testing purposes and realized the sprites look weird, I have no way of fixing this currently :[
+
 aha! This started as editing my gamejam but guess what! The only thing that really stayed was the sprites! Because I kind of added more and changed stuff around so... It's practically a new game now so um... yeah knew I had to mention that somewhere--
 */
 
