@@ -29,23 +29,18 @@ class Act1 extends Phaser.Scene {
         let plantsBase = map.addTilesetImage("Basic_Grass_Biom_things", "plantsImage");
         let plants = map.createLayer("plantLife", plantsBase, 0, 0);
 
-        //Loading Avatar
-        this.avatar = this.physics.add.sprite(150, 100, `avatar`);
-        this.avatar.setSize(16, 20, true)
-
         this.bridgeInteractionTrigger = this.physics.add.sprite(120, 250, `invisibleTrigger`);
+        this.bridgeInteractionTrigger2 = this.physics.add.sprite(120, 300, `invisibleTrigger`);
 
         //Loads the fence layer + adds collisions between the avatar and fence
         let fencesBase = map.addTilesetImage("Fences", "fencesImage");
         let fence = map.createLayer("fenceLayer", fencesBase);
-        fence.setCollisionByProperty({ collides: true });
-        this.physics.add.collider(this.avatar, fence);
+        
 
         //Loads the rope layer + adds collisions between the avatar and rope
         let ropeBase = map.addTilesetImage("Rope", "ropeImage");
         let rope = map.createLayer("ropeLayer", ropeBase);
-        rope.setCollisionByProperty({ collides: true });
-        this.physics.add.collider(this.avatar, rope);
+        
 
         //Loads the first NPC image and the collision box as well as making it immovable
         this.npc1 = this.physics.add.sprite(250, 105, "npc1").setImmovable(true);
@@ -63,29 +58,28 @@ class Act1 extends Phaser.Scene {
         this.sign.setSize(20, 20, true)
         this.door = this.physics.add.sprite(510, 80, "door").setImmovable(true);
 
-        // COLLECTABLES
+        //Loading Avatar
+        this.avatar = this.physics.add.sprite(150, 100, `avatar`);
+        this.avatar.setSize(16, 20, true)
+
+        //FENCE AND ROPE COLLISION WITH AVATAR
+        fence.setCollisionByProperty({ collides: true });
+        this.physics.add.collider(this.avatar, fence);
+        rope.setCollisionByProperty({ collides: true });
+        this.physics.add.collider(this.avatar, rope);
+
+        // Called collectables as they were remnants from my game jam! Now they work the purpose to teleport you if you go through them so thats fun. Group just takes the key (as in the form-image it would take) and then the quantity.
         this.collectables = this.physics.add.group({
             key: 'tree',
             quantity: 9
         });
 
+        //In here then we have it that the 9 collectable trees would appear between the specific coordinates I put down, I also have it to change color just because I felt like it and honestly it's kind of funny so I love it like this.
         this.collectables.children.each(function (collectable) {
             let x = Phaser.Math.Between(400, 600);
             let y = Phaser.Math.Between(700, 900);
             collectable.setPosition(x, y);
             collectable.setTint(`0x3333dd`);
-        }, this);
-
-        //Loads the Talking Tree
-        this.talkingTree = this.physics.add.group({
-            key: 'tree',
-            quantity: 1,
-            immovable: true,
-        });
-
-        this.talkingTree.children.each(function (talkingTreeA) {
-            talkingTreeA.setPosition(100, 100);
-            talkingTreeA.setTint(`0x3333dd`);
         }, this);
 
         //Invisible block that literally only serves the purpose so that .countActive can be used for grabbing the star as countActive only works with this for some reason
@@ -99,22 +93,27 @@ class Act1 extends Phaser.Scene {
             gateTriggerS.setPosition(700, 60);
         }, this);
 
+        //Makes the lovely talking tree appear, putting it's location and making it immovable. "but why is it still blue?" because I think its silly goofy next question
+        this.talkingTree = this.physics.add.sprite(100, 100, "tree").setImmovable(true).setTint(`0x3333dd`);
+
         //Adds the colliders between the avatar and different objects
         this.physics.add.collider(this.avatar, this.talkingTree, this.displayTreeDialog, null, this);
+
         //If the avatar collides with the NPC it will call for the function of displaying the NPC dialog
         this.physics.add.collider(this.avatar, this.npc1, this.displayNPC1Dialog, null, this);
         this.physics.add.collider(this.avatar, this.npc2, this.displayNPC2Dialog, null, this);
         this.physics.add.collider(this.avatar, this.npc5, this.displayNPC5Dialog, null, this);
+
         //If the avatar collides with the collectable plants, it will call for the collectItem function
         this.physics.add.overlap(this.avatar, this.collectables, this.collectItem, null, this);
         this.physics.add.collider(this.avatar, this.door, this.insideHouse, null, this);
 
         this.physics.add.overlap(this.avatar, this.bridgeInteractionTrigger, this.displayBridgeDialog, null, this);
+        this.physics.add.overlap(this.avatar, this.bridgeInteractionTrigger2, this.displayBridgeDialog, null, this);
 
         this.physics.add.collider(this.avatar, this.sign, this.displaySignDialog, null, this);
 
         this.physics.add.overlap(this.avatar, this.gateTrigger, this.gateTriggerFarmer, null, this);
-
 
         if (this.gateTrigger.countActive() == 1) {
             this.gate = this.physics.add.sprite(512, 165, `gate`).setImmovable(true);
@@ -148,12 +147,14 @@ class Act1 extends Phaser.Scene {
         this.cameras.main.setZoom(2)
     }
 
+    //Function specifically for the dialog box as well as the icons, I put down the location, the scroll factor (that basically makes it that even when the camera moves, it will be in the same location, so it doesn't move with the camera per say) and finally the setVisible (display) as false so I can turn it on when I need it <3
     displayDialogBoxes() {
         this.testBox = this.add.image(240, 350, "testBox").setOrigin(0)
         this.testBox.setScrollFactor(0)
         this.testBox.setVisible(false);
 
-        this.treeIcon = this.add.image(45, 205, "treeIcon").setOrigin(0)
+        //I just want to add as a note that I made it the same tint as the actual in game sprite and it's SO UGLY but I love it and it's so out of place and that's fitting so um enjoy my very very blue tree
+        this.treeIcon = this.add.image(45, 205, "treeIcon").setOrigin(0).setTint(`0x3333dd`)
         this.treeIcon.setVisible(false);
 
         this.avatarIcon = this.add.image(245, 355, "avatarIcon").setOrigin(0)
@@ -198,8 +199,8 @@ class Act1 extends Phaser.Scene {
         this.scene.start("act2");
     }
 
-    //pause the main act of the game (main area) to instead start the inside of the house instead. When you leave the house also move the avatar + 10 pixels in the y direction so the user wouldn't walk into the trigger again
     insideHouse() {
+        //pause the main act of the game (main area) to instead start the inside of the house instead. When you leave the house also move the avatar + 10 pixels in the y direction so the user wouldn't walk into the trigger again
         this.scene.pause("act1")
         this.scene.resume("house")
         this.scene.setVisible(false, "act1")
@@ -226,7 +227,6 @@ class Act1 extends Phaser.Scene {
         this.testBox.setVisible(true);
         this.avatarIcon.setVisible(true);
         this.dialogBoxGate.setVisible(true);
-        this.dialogBoxGate.setScrollFactor(0)
         this.physics.pause();
     }
 
@@ -252,7 +252,6 @@ class Act1 extends Phaser.Scene {
             this.testBox.setVisible(true);
             this.npc1Icon.setVisible(true);
             this.dialogBoxNPC1A.setVisible(true);
-            // this.dialogBoxNPC1A.setPosition(170, 200);
             this.physics.pause();
         } else {
             this.invisibleTrigger = this.physics.add.sprite(250, 130, `invisibleTrigger`).setImmovable(true);

@@ -14,7 +14,7 @@ class Death extends Phaser.Scene {
         //Makes the PLAY button interactive and makes it when you click on it wiht your cursor it will change the scene to the "play" one
         playAgain.setInteractive()
         playAgain.on("pointerdown", () => {
-            this.scene.start("play");
+            this.scene.start("act1");
         })
     }
 

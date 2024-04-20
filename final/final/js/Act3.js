@@ -82,9 +82,13 @@ class Act3 extends Phaser.Scene {
         this.physics.add.collider(this.avatar, rope);
 
         this.bridgeInteractionTrigger = this.physics.add.sprite(120, 250, `invisibleTrigger`);
+        this.bridgeInteractionTrigger2 = this.physics.add.sprite(120, 300, `invisibleTrigger`);
+        
         this.sign = this.physics.add.sprite(470, 105, "sign").setImmovable(true);
         this.sign.setSize(20, 20, true)
         this.door = this.physics.add.sprite(510, 80, "door").setImmovable(true);
+
+        this.endingTrigger = this.physics.add.sprite(510, 600, "invisibleTrigger").setImmovable(true);
 
         // COLLECTABLES
         this.collectables = this.physics.add.group({
@@ -144,23 +148,26 @@ class Act3 extends Phaser.Scene {
         //If the avatar collides with the collectable plants, it will call for the collectItem function
         this.physics.add.overlap(this.avatar, this.collectables, this.collectItem, null, this);
         this.physics.add.collider(this.avatar, this.door, this.displayHouseDialog, null, this);
+        this.physics.add.overlap(this.avatar, this.endingTrigger, this.changeScene , null, this);
 
+        //When the user tries to get to the bridge, it would be met with a dialog
         this.physics.add.overlap(this.avatar, this.bridgeInteractionTrigger, this.displayBridgeDialog, null, this);
+        this.physics.add.overlap(this.avatar, this.bridgeInteractionTrigger2, this.displayBridgeDialog, null, this);
 
         this.physics.add.collider(this.avatar, this.sign, this.displaySignDialog, null, this);
-
-        // this.physics.add.overlap(this.avatar, this.gateTrigger, this.gateTriggerFarmer, null, this);
 
         if (this.openerScene.countActive() == 1) {
             this.physics.add.overlap(this.avatar, this.openerScene, this.   displayOpenerDialog, null, this);
         }
-
 
         if (this.gateTrigger.countActive() == 1) {
             this.gate = this.physics.add.sprite(512, 165, `gate`).setImmovable(true);
             this.physics.add.collider(this.avatar, this.gate, this.displayGateDialog, null, this);
             this.physics.add.collider(this.avatar, this.gate);
         }
+
+        //Calls the "crops" function
+        this.createCrops()
 
         //Calls the function for the dialog boxes themselves
         this.displayDialogBoxes()
@@ -173,8 +180,6 @@ class Act3 extends Phaser.Scene {
 
         //calls the animation function
         this.createAnimations();
-
-        this.createCrops()
 
         //Makes the default animations the idle ones for each character on the screen
         this.npc1.play("npcIdle1", true)
@@ -287,7 +292,10 @@ class Act3 extends Phaser.Scene {
 
     changeScene() {
         //Change the scene to another state
-        this.scene.start("play2");
+        this.cameras.main.fadeOut(1000, 0, 0, 0)
+            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+                this.scene.start('ending')
+            })
     }
 
     insideHouse() {
@@ -425,7 +433,7 @@ class Act3 extends Phaser.Scene {
         if (this.collectables.countActive() >= 8) {
             this.cameras.main.fadeOut(1000, 0, 0, 0)
             this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-                this.scene.start('play2')
+                this.scene.start('act3')
             })
         }
     }

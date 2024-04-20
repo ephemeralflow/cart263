@@ -46,7 +46,9 @@ class Act2 extends Phaser.Scene {
 
         //Loads the colliders for the trees as well as the checkers and the door to call different functions
         this.physics.add.collider(this.avatar, this.trees);
-        this.physics.add.collider(this.avatar, this.door, this.changeScene, null, this);
+
+        this.physics.add.collider(this.avatar, this.door, this.doorActions, null, this);
+        
         //When the NPC and the avatar collide, change the DEAD scene
         this.physics.add.collider(this.avatar, this.invisibleTrigger, this.collectStar, null, this);
       
@@ -73,11 +75,13 @@ class Act2 extends Phaser.Scene {
     starCollect(avatar, star) {
         this.star.setVisible(false)
     }
-    //function for when you overlap with the star (which has an extra checker) it will get destroyed
+    
+    //function for when you overlap with the star (which has an extra checker) it will get destroyed, you'd think that if I just make the star itself do this it would work right!? NUH UH the countActive just breaks and the group breaks and everything breaks and um yes that's why its like this
     collectStar(avatar, item) {
         item.destroy();
     }
 
+    //if you get touched by the enemy you get sent to the death scene
     endOfGame() {
         this.scene.start('death')
     }
@@ -88,11 +92,69 @@ class Act2 extends Phaser.Scene {
         this.physics.moveToObject(this.npc3,this.avatar,100)
     }
 
-    changeScene() {
-        //Change the scene to another state
+    doorActions() {
+        //If the player and the door overlap and the key is still on the game field, it will display the text box of the avatar talking which would give the hint to go searching for the key
+        if (this.invisibleTrigger.countActive() == 1) {
+            this.testBox = this.add.image(240, 350, "testBox").setOrigin(0)
+            this.testBox.setScrollFactor(0)
+            this.testBox.setVisible(true);
+
+            this.dialogBoxFunction()
+
+            this.avatarIcon = this.add.image(245, 355, "avatarIcon").setOrigin(0)
+            this.avatarIcon.setScrollFactor(0)
+            this.avatarIcon.setVisible(true);
+
+            this.doorDialogBox.setScrollFactor(0)
+            this.doorDialogBox.setPosition(325, 350);
+            this.doorDialogBox.setVisible(true);
+
+            this.physics.pause();
+        }
+
+        //However if the key has been acquired, then the state would change to the final act
         if (this.invisibleTrigger.countActive() == 0) {
             this.scene.start("act3");
         }
+    }
+
+    //When the spacebar is pressed (see handleInput) call this function, which just makes the parts disappear and resume the physics
+    hideDialog() {
+        this.doorDialogBox.setVisible(false);
+        this.testBox.setVisible(false);
+        this.avatarIcon.setVisible(false);
+        
+        this.physics.resume();
+    }
+
+    //Sets the appearance + what the dialog would look like in one silly function
+    dialogBoxFunction() {
+        //  Sets the appearance of the text shown
+        const configStyle = {
+            fontSize: '28px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            align: 'center',
+            // backgroundColor: '#ff00ff',
+            shadow: {
+                color: '#000000',
+                fill: true,
+                offsetX: 2,
+                offsetY: 2,
+                blur: 8
+            }
+        }
+
+        //Sets the text of everything that speaks
+        const doorDialog = {
+            text: "Maybe I have to\nfind a key...",
+            style: configStyle
+        };
+
+        //sets the dialog box as well as the text goes in 
+        this.doorDialogBox = this.make.text(doorDialog);
+        this.doorDialogBox.setVisible(false);
+        
     }
 
     handleInput() {

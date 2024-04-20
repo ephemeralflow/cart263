@@ -32,27 +32,30 @@ class House extends Phaser.Scene {
         this.avatar = this.physics.add.sprite(255, 90, `avatar`);
         this.avatar.setSize(16, 20, true)
 
-        
+        this.duck = this.physics.add.sprite(208, 165, `duck`).setImmovable(true);
+        this.duck.setSize(34, 25, true)
 
         furniture.setCollisionByProperty({ collides: true });
         this.physics.add.collider(this.avatar, furniture);
         this.avatar.setCollideWorldBounds(true);
 
         this.npc4 = this.physics.add.sprite(120, 85, "npc4").setImmovable(true);
-        this.npc4.setSize(10, 30, true)
+        this.npc4.setSize(10, 30, true);
+
 
         this.doorTrigger = this.physics.add.sprite(255, 40, "invisibleTrigger").setImmovable(true);
         this.physics.add.collider(this.avatar, this.doorTrigger, this.changeScene, null, this);
         this.physics.add.collider(this.avatar, this.npc4, this.displayNPC4Dialog, null, this);
+        this.physics.add.collider(this.avatar, this.duck, this.displayDuckDialog, null, this);
 
         //Calls the function for the dialog boxes themselves
-        this.displayDialogBoxes()
+        this.displayDialogBoxes();
 
         //Calls the function for the text
-        this.dialogBoxFunction()
+        this.dialogBoxFunction();
 
         //Calls the function to display the location of the text
-        this.displayTextLocations()
+        this.displayTextLocations();
 
         //Calls the animation function as well as makes the default animations the idle ones for each character on the screen
         this.createAnimations();
@@ -72,14 +75,26 @@ class House extends Phaser.Scene {
         this.avatarIcon = this.add.image(245, 355, "avatarIcon").setOrigin(0)
         this.avatarIcon.setScrollFactor(0)
         this.avatarIcon.setVisible(false);
+
+        this.yesButton = this.add.image(150, 260, "yesButton")
+        this.yesButton.setVisible(false);
+
+        this.duckDialog = this.add.image(155, 258, "duckDialog")
+        this.duckDialog.setVisible(false);
+
+        this.noButton = this.add.image(250, 260, "noButton")
+        this.noButton.setVisible(false);
     }
 
     displayTextLocations() {
         this.dialogBoxNPC4.setScrollFactor(0)
         this.dialogBoxNPC4.setPosition(325, 350);
+
+        this.dialogBoxDuck.setScrollFactor(0)
+        this.dialogBoxDuck.setPosition(325, 350);
     }
 
-    displayNPC4Dialog(avatar, talkingTree) {
+    displayNPC4Dialog() {
         // Display the dialog as well as pausing the physics so you can't move
         this.testBox.setVisible(true);
         this.avatarIcon.setVisible(true);
@@ -88,11 +103,45 @@ class House extends Phaser.Scene {
         this.physics.pause();
     }
 
+    displayDuckDialog() {
+        // Display the dialog as well as pausing the physics so you can't move
+        this.testBox.setVisible(true);
+        this.avatarIcon.setVisible(true);
+        this.dialogBoxDuck.setVisible(true);
+
+        this.yesButton.setVisible(true);
+        this.duckDialog.setVisible(true);
+        this.noButton.setVisible(true);
+        
+        //Makes the "yes" word interactable so the player can press to take the duck, calling a function to destroy the duck item and also call the hideDialog function to exit out of the scene
+        this.yesButton.setInteractive()
+        this.yesButton.on("pointerdown", () => {
+            this.getDuck()
+            this.hideDialog()
+        })
+
+        //Makes the "no" word interactable so the player can press no to the duck and exit out of the dialog by calling the "hideDialog" function 
+        this.noButton.setInteractive()
+        this.noButton.on("pointerdown", () => {
+            this.hideDialog()
+        })
+        
+        this.physics.pause();
+    }
+
+    getDuck() {
+        this.duck.destroy();
+    }
+
     //Hides the dialog as well as resumes the physics so you can move again
     hideDialog() {
         this.testBox.setVisible(false);
         this.avatarIcon.setVisible(false);
         this.dialogBoxNPC4.setVisible(false);
+        this.dialogBoxDuck.setVisible(false);
+        this.yesButton.setVisible(false);
+        this.duckDialog.setVisible(false);
+        this.noButton.setVisible(false);
         this.physics.resume();
     }
 
@@ -118,9 +167,17 @@ class House extends Phaser.Scene {
             style: configStyle
         };
 
+        const duckInteraction = {
+            text: "Cute duck...",
+            style: configStyle
+        };
+
         //sets the dialog box as well as the text goes in 
         this.dialogBoxNPC4 = this.make.text(npc4Interaction);
         this.dialogBoxNPC4.setVisible(false);
+
+        this.dialogBoxDuck = this.make.text(duckInteraction);
+        this.dialogBoxDuck.setVisible(false);
     }
 
     changeScene() {
