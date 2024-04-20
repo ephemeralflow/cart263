@@ -7,7 +7,7 @@ class Boot extends Phaser.Scene {
 
     preload() {
         //Loading Assets
-        this.load.image("titleBG", "assets/images/mainMenu/menu.jpg")
+        this.load.image("titleBG", "assets/images/mainMenu/menu.png")
         this.load.image("playButton", "assets/images/mainMenu/playButton.png")
         this.load.image("instructionButton", "assets/images/mainMenu/instructionButton.png")
         this.load.image("instructionPage", "assets/images/mainMenu/instructionPage.png")
@@ -17,6 +17,7 @@ class Boot extends Phaser.Scene {
         this.load.image("endingCard", "assets/images/mainMenu/endingCard.png")
         this.load.image("deathImage", "assets/images/mainMenu/death.jpg")
         this.load.image("playAgain", "assets/images/mainMenu/playAgain.png")
+        this.load.image("clown", "assets/images/clown.png")
 
         //Loading the spritesheets for the main avatar and the NPCs
         this.load.spritesheet("avatar", "assets/images/avatar.png", {
@@ -108,15 +109,124 @@ class Boot extends Phaser.Scene {
 
 
         this.load.on("complete", () => {
-            this.scene.launch("act3");
+            this.scene.launch("ending");
         })
     }
 
     create() {
-
+        this.createAnimations()
     }
 
     update() {
 
+    }
+
+    //Create the animations for the characters (such as idle and walking for the main avatar) and just idle in general. Also creates animations for misc stuff that would be used throughout the game
+    createAnimations() {
+        let idleAvatar = {
+            key: `idle`,
+            frames: this.anims.generateFrameNumbers(`avatar`, {
+                start: 27,
+                end: 28
+            }),
+            frameRate: 2,
+            repeat: -1
+        };
+        this.anims.create(idleAvatar);
+
+        let npcIdle1 = {
+            key: "npcIdle1",
+            frames: this.anims.generateFrameNumbers("npc1", { frames: [0, 1] }),
+            frameRate: 2,
+            repeat: -1
+        };
+        this.anims.create(npcIdle1);
+
+        let npcIdle2 = {
+            key: "npcIdle2",
+            frames: this.anims.generateFrameNumbers("npc2", { frames: [0, 1] }),
+            frameRate: 2,
+            repeat: -1
+        };
+        this.anims.create(npcIdle2);
+
+        let npcIdle5 = {
+            key: "npcIdle5",
+            frames: this.anims.generateFrameNumbers("npc5", { frames: [0, 1] }),
+            frameRate: 2,
+            repeat: -1
+        };
+        this.anims.create(npcIdle5);
+
+        let forwardAvatar = {
+            key: `avatarWalkForward`,
+            frames: this.anims.generateFrameNumbers(`avatar`, {
+                start: 0,
+                end: 8
+            }),
+            frameRate: 24,
+            repeat: -1
+        };
+        this.anims.create(forwardAvatar);
+
+        this.anims.create({
+            key: "avatarWalkBack",
+            frames: this.anims.generateFrameNumbers("avatar", { frames: [22, 23, 24, 25, 26] }),
+            frameRate: 24,
+            repeat: -1
+        })
+
+        let rightSideAvatar = {
+            key: `avatarWalkSideRight`,
+            frames: this.anims.generateFrameNumbers(`avatar`, {
+                start: 9,
+                end: 15
+            }),
+            frameRate: 16,
+            repeat: -1
+        };
+        this.anims.create(rightSideAvatar);
+
+        let leftSideAvatar = {
+            key: `avatarWalkSideLeft`,
+            frames: this.anims.generateFrameNumbers(`avatar`, {
+                start: 16,
+                end: 21
+            }),
+            frameRate: 16,
+            repeat: -1
+        };
+        this.anims.create(leftSideAvatar);
+
+        let outWords = {
+            key: `outAnim`,
+            frames: this.anims.generateFrameNumbers(`out`, {
+                start: 0,
+                end: 15
+            }),
+            frameRate: 8,
+        };
+        this.anims.create(outWords);
+
+        this.anims.create({
+            key: "idleNPC3",
+            frames: this.anims.generateFrameNumbers("npc3", { frames: [0, 1, 2, 3] }),
+            frameRate: 2,
+            repeat: -1
+        })
+
+        this.anims.create({
+            key: "starAnim",
+            frames: this.anims.generateFrameNumbers("star", { frames: [0, 1, 2, 3, 4, 5, 6, 7, 8] }),
+            frameRate: 12,
+            repeat: -1
+        })
+
+        this.anims.create({
+            key: "idleNPC4",
+            frames: this.anims.generateFrameNumbers("npc4", { frames: [0, 1] }),
+            frameRate: 2,
+            repeat: -1
+        })
     }
 }

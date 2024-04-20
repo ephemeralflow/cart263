@@ -32,6 +32,7 @@ class House extends Phaser.Scene {
         this.avatar = this.physics.add.sprite(255, 90, `avatar`);
         this.avatar.setSize(16, 20, true)
 
+        //Loading Duck that literally serves no purpose except existing and being cute
         this.duck = this.physics.add.sprite(208, 165, `duck`).setImmovable(true);
         this.duck.setSize(34, 25, true)
 
@@ -57,8 +58,7 @@ class House extends Phaser.Scene {
         //Calls the function to display the location of the text
         this.displayTextLocations();
 
-        //Calls the animation function as well as makes the default animations the idle ones for each character on the screen
-        this.createAnimations();
+        //Calls the animations for each character
         this.avatar.play(`idle`);
         this.npc4.play("idleNPC4")
 
@@ -233,15 +233,5 @@ class House extends Phaser.Scene {
         else {
             this.avatar.play(`idle`, true);
         }
-    }
-
-    //Create the animations for the characters (such as idle and walking for the main avatar)
-    createAnimations() {
-        this.anims.create({
-            key: "idleNPC4",
-            frames: this.anims.generateFrameNumbers("npc4", { frames: [0, 1] }),
-            frameRate: 2,
-            repeat: -1
-        })
     }
 }

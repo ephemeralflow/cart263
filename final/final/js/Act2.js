@@ -53,7 +53,6 @@ class Act2 extends Phaser.Scene {
         this.physics.add.collider(this.avatar, this.invisibleTrigger, this.collectStar, null, this);
       
         //Calls the animation function as well as makes the default animations the idle ones for each character on the screen
-        this.createAnimations();
         this.npc3.play("idleNPC3", true)
         this.star.play("starAnim", true)
         this.avatar.play(`idle`);
@@ -75,7 +74,7 @@ class Act2 extends Phaser.Scene {
     starCollect(avatar, star) {
         this.star.setVisible(false)
     }
-    
+
     //function for when you overlap with the star (which has an extra checker) it will get destroyed, you'd think that if I just make the star itself do this it would work right!? NUH UH the countActive just breaks and the group breaks and everything breaks and um yes that's why its like this
     collectStar(avatar, item) {
         item.destroy();
@@ -197,21 +196,5 @@ class Act2 extends Phaser.Scene {
         else {
             this.avatar.play(`idle`, true);
         }
-    }
-
-    //Create the animations for the characters (such as idle and walking for the main avatar)
-    createAnimations() {
-        this.anims.create({
-            key: "idleNPC3",
-            frames: this.anims.generateFrameNumbers("npc3", { frames: [0, 1, 2, 3] }),
-            frameRate: 2,
-            repeat: -1
-        })
-        this.anims.create({
-            key: "starAnim",
-            frames: this.anims.generateFrameNumbers("star", { frames: [0, 1, 2, 3, 4, 5, 6, 7, 8] }),
-            frameRate: 12,
-            repeat: -1
-        })
     }
 }
