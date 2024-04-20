@@ -107,7 +107,6 @@ class Boot extends Phaser.Scene {
         this.load.image("furnitureImage", "assets/images/tilesImages/TopDownHouse_FurnitureState3.png")
         this.load.tilemapTiledJSON("innerHouse", "assets/images/insideHouse.json")
 
-
         this.load.on("complete", () => {
             this.scene.launch("menu");
         })
