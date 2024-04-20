@@ -7,7 +7,7 @@ class Act3 extends Phaser.Scene {
 
     create() {
         //Sets the camera of the scene + the physics so it will move
-        this.cameras.main.setBounds(0, 0, 480 * 2, 480 * 2);
+        this.cameras.main.setScroll(-400, -300);
         this.physics.world.setBounds(0, 0, 480 * 2, 480 * 2);
         this.cameras.main.fadeIn(1000, 0, 0, 0)
 
@@ -15,7 +15,7 @@ class Act3 extends Phaser.Scene {
         let map = this.make.tilemap({ key: "mapTest" })
 
         let waterBase = map.addTilesetImage("Water", "waterImage");
-        let water = map.createLayer("water", waterBase);
+        let water = map.createLayer("water", waterBase,-100,-100);
 
         let grassBase = map.addTilesetImage("Grass", "grassImage");
         let ground = map.createLayer("ground", grassBase, 0, 0);
@@ -33,7 +33,6 @@ class Act3 extends Phaser.Scene {
         let fencesBase = map.addTilesetImage("Fences", "fencesImage");
         let fence = map.createLayer("fenceLayer", fencesBase);
         
-
         //Loads the rope layer
         let ropeBase = map.addTilesetImage("Rope", "ropeImage");
         let rope = map.createLayer("ropeLayer", ropeBase);
@@ -196,7 +195,8 @@ class Act3 extends Phaser.Scene {
         this.testBox.setScrollFactor(0)
         this.testBox.setVisible(false);
 
-        this.treeIcon = this.add.image(45, 205, "treeIcon").setOrigin(0).setTint(`0x3333dd`)
+        this.treeIcon = this.add.image(245, 355, "treeIcon").setOrigin(0).setTint(`0x3333dd`)
+        this.treeIcon.setScrollFactor(0)
         this.treeIcon.setVisible(false);
 
         this.avatarIcon = this.add.image(245, 355, "avatarIcon").setOrigin(0)

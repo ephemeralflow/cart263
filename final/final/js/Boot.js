@@ -78,6 +78,8 @@ class Boot extends Phaser.Scene {
         this.load.image("npc5Icon", "assets/images/npc5Icon.png")
         this.load.image("overlay", "assets/images/overlay.png")
         this.load.image("duck", "assets/images/duck.png")
+        this.load.image("duck1", "assets/images/duck1.png")
+        this.load.image("duckIcon", "assets/images/duckIcon.png")
         this.load.image("duckDialog", "assets/images/duckDialog.png")
         this.load.image("yesButton", "assets/images/yes.png")
         this.load.image("noButton", "assets/images/no.png")

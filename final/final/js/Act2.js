@@ -6,7 +6,7 @@ class Act2 extends Phaser.Scene {
     }
 
     create() {
-        this.cameras.main.setBounds(0, 0, 500 * 2, 500 * 2);
+        this.cameras.main.setScroll(-400, -300);
         this.physics.world.setBounds(0, 0, 500 * 2, 500 * 2);
 
         //Makes the tree objects that will be put randomly around the world

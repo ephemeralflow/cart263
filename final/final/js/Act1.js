@@ -7,7 +7,7 @@ class Act1 extends Phaser.Scene {
 
     create() {
         //Sets the camera of the scene + the physics so it will move
-        this.cameras.main.setBounds(0, 0, 480 * 2, 480 * 2);
+        this.cameras.main.setScroll(-400, -300);
         this.physics.world.setBounds(0, 0, 480 * 2, 480 * 2);
         this.cameras.main.fadeIn(1000, 0, 0, 0)
 
@@ -15,7 +15,7 @@ class Act1 extends Phaser.Scene {
         let map = this.make.tilemap({ key: "mapTest" })
 
         let waterBase = map.addTilesetImage("Water", "waterImage");
-        let water = map.createLayer("water", waterBase);
+        let water = map.createLayer("water", waterBase,-100,-100);
 
         let grassBase = map.addTilesetImage("Grass", "grassImage");
         let ground = map.createLayer("ground", grassBase, 0, 0);
@@ -36,12 +36,10 @@ class Act1 extends Phaser.Scene {
         let fencesBase = map.addTilesetImage("Fences", "fencesImage");
         let fence = map.createLayer("fenceLayer", fencesBase);
         
-
         //Loads the rope layer + adds collisions between the avatar and rope
         let ropeBase = map.addTilesetImage("Rope", "ropeImage");
         let rope = map.createLayer("ropeLayer", ropeBase);
         
-
         //Loads the first NPC image and the collision box as well as making it immovable
         this.npc1 = this.physics.add.sprite(250, 105, "npc1").setImmovable(true);
         this.npc1.setSize(10, 20, true)
@@ -108,6 +106,10 @@ class Act1 extends Phaser.Scene {
         this.gate = this.physics.add.sprite(512, 165, `gate`).setImmovable(true);
         this.physics.add.collider(this.avatar, this.gate, this.displayGateDialog, null, this);
 
+        //Makes the duck and collisions for said duck THATS OUT OF BOUNDS how dare you go through the struggle to see the duck (me too)
+        this.duck = this.physics.add.sprite(512, 1100, `duck1`).setImmovable(true);
+        this.physics.add.collider(this.avatar, this.duck, this.displayDuckialog, null, this);
+
         //Calls the function for the dialog boxes themselves
         this.displayDialogBoxes()
 
@@ -138,7 +140,8 @@ class Act1 extends Phaser.Scene {
         this.testBox.setVisible(false);
 
         //I just want to add as a note that I made it the same tint as the actual in game sprite and it's SO UGLY but I love it and it's so out of place and that's fitting so um enjoy my very very blue tree
-        this.treeIcon = this.add.image(45, 205, "treeIcon").setOrigin(0).setTint(`0x3333dd`)
+        this.treeIcon = this.add.image(245, 355, "treeIcon").setOrigin(0).setTint(`0x3333dd`);
+        this.treeIcon.setScrollFactor(0);
         this.treeIcon.setVisible(false);
 
         this.avatarIcon = this.add.image(245, 355, "avatarIcon").setOrigin(0)
@@ -156,9 +159,16 @@ class Act1 extends Phaser.Scene {
         this.npc5Icon = this.add.image(245, 355, "npc5Icon").setOrigin(0)
         this.npc5Icon.setScrollFactor(0)
         this.npc5Icon.setVisible(false);
+
+        this.duckIcon = this.add.image(245, 355, "duckIcon").setOrigin(0)
+        this.duckIcon.setScrollFactor(0)
+        this.duckIcon.setVisible(false);
     }
 
     displayTextLocations() {
+        this.dialogBox.setScrollFactor(0);
+        this.dialogBox.setPosition(325, 350);
+
         this.dialogBoxNPC1.setScrollFactor(0)
         this.dialogBoxNPC1.setPosition(325, 350);
 
@@ -170,6 +180,9 @@ class Act1 extends Phaser.Scene {
 
         this.dialogBoxGate.setScrollFactor(0) 
         this.dialogBoxGate.setPosition(325, 350);
+
+        this.dialogBoxDuck.setScrollFactor(0) 
+        this.dialogBoxDuck.setPosition(325, 350);
 
         this.dialogBoxSign.setScrollFactor(0) 
         this.dialogBoxSign.setPosition(325, 350);
@@ -197,7 +210,6 @@ class Act1 extends Phaser.Scene {
         this.testBox.setVisible(true);
         this.treeIcon.setVisible(true);
         this.dialogBox.setVisible(true);
-        this.dialogBox.setPosition(110, 200);
         this.physics.pause();
     }
 
@@ -206,6 +218,14 @@ class Act1 extends Phaser.Scene {
         this.testBox.setVisible(true);
         this.avatarIcon.setVisible(true);
         this.dialogBoxGate.setVisible(true);
+        this.physics.pause();
+    }
+
+    displayDuckialog() {
+        // Display the dialog as well as pausing the physics so you can't move
+        this.testBox.setVisible(true);
+        this.duckIcon.setVisible(true);
+        this.dialogBoxDuck.setVisible(true);
         this.physics.pause();
     }
 
@@ -260,11 +280,13 @@ class Act1 extends Phaser.Scene {
         this.testBox.setVisible(false);
         this.dialogBoxSign.setVisible(false);
         this.dialogBoxGate.setVisible(false);
+        this.dialogBoxDuck.setVisible(false);
         this.treeIcon.setVisible(false);
         this.avatarIcon.setVisible(false);
         this.npc1Icon.setVisible(false);
         this.npc2Icon.setVisible(false);
         this.npc5Icon.setVisible(false);
+        this.duckIcon.setVisible(false);
         this.bridgeInteractionBox.setVisible(false);
         this.physics.resume();
     }
@@ -372,6 +394,11 @@ class Act1 extends Phaser.Scene {
             style: configStyle
         };
 
+        const duckText = {
+            text: "quack",
+            style: configStyle
+        };
+
         const npc1Talk = {
             text: 'Hello!!!',
             style: configStyle
@@ -399,6 +426,9 @@ class Act1 extends Phaser.Scene {
 
         this.dialogBoxGate = this.make.text(gateText);
         this.dialogBoxGate.setVisible(false);
+
+        this.dialogBoxDuck = this.make.text(duckText);
+        this.dialogBoxDuck.setVisible(false);
 
         this.dialogBoxNPC1 = this.make.text(npc1Talk);
         this.dialogBoxNPC1.setVisible(false);
